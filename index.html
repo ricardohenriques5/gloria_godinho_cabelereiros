@@ -974,8 +974,9 @@ async function saveAdminBooking() {
 
 /* ── MISC ── */
 window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50))
-const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1})
+const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0, rootMargin:'0px 0px -50px 0px'})
 document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el))
+setTimeout(() => { document.querySelectorAll('.fade-up').forEach(el => { const rect = el.getBoundingClientRect(); if(rect.top < window.innerHeight) el.classList.add('visible') }) }, 100)
 function toggleMenu(){const l=document.querySelector('.nav-links'),c=document.querySelector('.nav-cta'),o=l.style.display==='flex';l.style.cssText=o?'':'display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:#0a0a0a;padding:2rem;gap:1.5rem;';c.style.cssText=o?'':'display:block;text-align:center;margin:0 1.5rem 1.5rem;'}
 
 // Data mínima = amanhã
