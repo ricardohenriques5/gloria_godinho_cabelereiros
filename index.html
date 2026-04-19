@@ -6,6 +6,9 @@
   <title>Glória Godinho Hair & Beauty</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
   <style>
     :root {
       --black:      #0a0a0a;
@@ -53,7 +56,7 @@
     .btn-primary:hover { background:var(--gold-light); transform:translateY(-2px); }
     .btn-ghost { display:inline-block; font-size:.6rem; letter-spacing:.25em; text-transform:uppercase; color:var(--gold); border:1px solid var(--border-h); padding:1rem 2.5rem; text-decoration:none; transition:border-color .3s,color .3s; }
     .btn-ghost:hover { border-color:var(--gold); color:var(--gold-light); }
-    .hero-badge { position:absolute; right:6rem; bottom:6rem; width:120px; height:120px; border:1px solid var(--border-h); border-radius:50%; display:flex; align-items:center; justify-content:center; text-align:center; }
+    .hero-badge { position:absolute; right:5rem; bottom:5rem; width:130px; height:130px; border:1px solid var(--border-h); border-radius:50%; display:flex; align-items:center; justify-content:center; text-align:center; background:rgba(10,10,10,.6); backdrop-filter:blur(4px); z-index:2; }
     .hero-badge-stars { color:var(--gold); font-size:.65rem; letter-spacing:.1em; }
     .hero-badge-num { font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:var(--gold-light); line-height:1; }
     .hero-badge-label { font-size:.5rem; letter-spacing:.15em; text-transform:uppercase; color:var(--grey); }
@@ -89,12 +92,11 @@
     .service-card { background:var(--black); padding:3rem 2.5rem; position:relative; overflow:hidden; transition:background .4s; cursor:pointer; }
     .service-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(to right,var(--gold),transparent); transform:scaleX(0); transform-origin:left; transition:transform .4s; }
     .service-card:hover, .service-card.selected { background:var(--black-card); }
+    .service-card:hover .service-img img, .service-card.selected .service-img img { opacity:.65; }
     .service-card:hover::before, .service-card.selected::before { transform:scaleX(1); }
     .service-card.selected { outline:1px solid rgba(201,168,76,.25); }
     .service-selected-badge { position:absolute; top:1rem; right:1rem; font-size:.5rem; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); border:1px solid var(--border-h); padding:.3rem .6rem; opacity:0; transition:opacity .3s; }
     .service-card.selected .service-selected-badge { opacity:1; }
-    .service-num { font-family:'Cormorant Garamond',serif; font-size:4rem; font-weight:300; color:rgba(201,168,76,.1); line-height:1; margin-bottom:1rem; transition:color .4s; }
-    .service-card:hover .service-num, .service-card.selected .service-num { color:rgba(201,168,76,.2); }
     .service-name { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:var(--white); margin-bottom:.75rem; }
     .service-desc { font-size:.75rem; line-height:1.7; color:var(--grey); margin-bottom:1.5rem; }
     .service-price { font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--gold); font-style:italic; }
@@ -238,6 +240,45 @@
     .bk-btn.cancel:hover { background:rgba(200,100,100,.1); }
     .no-bookings { text-align:center; color:var(--grey); font-size:.8rem; font-style:italic; padding:3rem; }
 
+
+    /* ADMIN — nova marcação modal */
+    .admin-new-btn { font-size:.55rem; letter-spacing:.2em; text-transform:uppercase; color:var(--black); background:var(--gold); border:none; padding:.5rem 1.2rem; cursor:pointer; font-family:'Montserrat',sans-serif; transition:background .3s; }
+    .admin-new-btn:hover { background:var(--gold-light); }
+    .admin-modal-overlay { display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,.75); align-items:center; justify-content:center; }
+    .admin-modal-overlay.open { display:flex; }
+    .admin-modal { background:var(--black-soft); border:1px solid var(--border-h); padding:2.5rem; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; }
+    .admin-modal-title { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:300; color:var(--gold-light); margin-bottom:2rem; }
+    .admin-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:1px; }
+    .admin-form-field { background:var(--black-card); padding:1rem 1.25rem; }
+    .admin-form-field.full { grid-column:span 2; }
+    .admin-form-label { display:block; font-size:.5rem; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:.35rem; }
+    .admin-form-input, .admin-form-select { width:100%; background:transparent; border:none; outline:none; color:var(--white); font-family:'Montserrat',sans-serif; font-size:.85rem; font-weight:300; }
+    .admin-form-select option { background:#111; color:var(--white); }
+    .admin-modal-actions { display:flex; gap:.75rem; margin-top:1px; }
+    .admin-modal-save { flex:1; background:var(--gold); color:var(--black); border:none; padding:1rem; font-family:'Montserrat',sans-serif; font-size:.6rem; letter-spacing:.25em; text-transform:uppercase; cursor:pointer; transition:background .3s; }
+    .admin-modal-save:hover { background:var(--gold-light); }
+    .admin-modal-save:disabled { opacity:.5; cursor:not-allowed; }
+    .admin-modal-cancel { background:none; color:var(--grey); border:1px solid var(--border); padding:1rem 1.5rem; font-family:'Montserrat',sans-serif; font-size:.6rem; letter-spacing:.25em; text-transform:uppercase; cursor:pointer; transition:all .3s; }
+    .admin-modal-cancel:hover { color:var(--white); border-color:var(--border-h); }
+    .admin-modal-err { display:none; font-size:.75rem; color:#e88; padding:.75rem 1rem; background:rgba(180,50,50,.1); border:1px solid rgba(180,50,50,.3); margin-bottom:1px; }
+
+    /* FLATPICKR custom theme */
+    .flatpickr-calendar { background:var(--black-soft) !important; border:1px solid var(--border-h) !important; border-radius:0 !important; box-shadow:0 8px 40px rgba(0,0,0,.6) !important; font-family:'Montserrat',sans-serif !important; }
+    .flatpickr-day { color:var(--white) !important; border-radius:0 !important; }
+    .flatpickr-day:hover { background:rgba(201,168,76,.15) !important; border-color:transparent !important; }
+    .flatpickr-day.selected, .flatpickr-day.selected:hover { background:var(--gold) !important; border-color:var(--gold) !important; color:var(--black) !important; }
+    .flatpickr-day.today { border-color:rgba(201,168,76,.4) !important; }
+    .flatpickr-day.disabled, .flatpickr-day.disabled:hover { color:rgba(136,136,128,.3) !important; background:transparent !important; cursor:not-allowed !important; }
+    .flatpickr-day.booked { background:rgba(180,50,50,.15) !important; color:rgba(200,100,100,.5) !important; cursor:not-allowed !important; text-decoration:line-through !important; }
+    .flatpickr-months { background:var(--black-card) !important; padding:.5rem 0 !important; }
+    .flatpickr-month { color:var(--gold-light) !important; }
+    .flatpickr-current-month { font-family:'Cormorant Garamond',serif !important; font-size:1.1rem !important; color:var(--gold-light) !important; }
+    .flatpickr-weekday { color:var(--gold) !important; font-size:.55rem !important; letter-spacing:.1em !important; }
+    .flatpickr-prev-month svg, .flatpickr-next-month svg { fill:var(--gold) !important; }
+    .numInputWrapper span { border-color:var(--border) !important; }
+    .numInputWrapper span:hover { background:rgba(201,168,76,.1) !important; }
+    .flatpickr-input { cursor:pointer !important; }
+
     /* ANIMATIONS */
     .fade-up { opacity:0; transform:translateY(30px); transition:opacity .8s ease,transform .8s ease; }
     .fade-up.visible { opacity:1; transform:translateY(0); }
@@ -307,7 +348,10 @@
         <button onclick="calNext()">›</button>
       </div>
       <div class="cal-grid" id="calGrid"></div>
-      <div class="admin-section-title">Marcações</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+        <div class="admin-section-title" style="margin-bottom:0">Marcações</div>
+        <button class="admin-new-btn" onclick="openNewBooking()">+ Nova Marcação</button>
+      </div>
       <div class="admin-filter">
         <button class="filter-btn active" onclick="filterBookings('todas',this)">Todas</button>
         <button class="filter-btn" onclick="filterBookings('pendente',this)">Pendentes</button>
@@ -319,6 +363,70 @@
         <tbody id="bookingsBody"></tbody>
       </table>
       <div class="no-bookings" id="noBookings" style="display:none">Sem marcações para mostrar.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ADMIN MODAL — nova marcação -->
+<div class="admin-modal-overlay" id="adminNewModal">
+  <div class="admin-modal">
+    <div class="admin-modal-title">Nova Marcação</div>
+    <div class="admin-modal-err" id="adminNewErr"></div>
+    <div class="admin-form-grid">
+      <div class="admin-form-field full">
+        <label class="admin-form-label">Nome do cliente</label>
+        <input class="admin-form-input" type="text" id="anNome" placeholder="Nome (opcional)">
+      </div>
+      <div class="admin-form-field">
+        <label class="admin-form-label">Telefone</label>
+        <input class="admin-form-input" type="tel" id="anTelefone" placeholder="opcional">
+      </div>
+      <div class="admin-form-field">
+        <label class="admin-form-label">Email</label>
+        <input class="admin-form-input" type="email" id="anEmail" placeholder="opcional">
+      </div>
+      <div class="admin-form-field">
+        <label class="admin-form-label">Serviço</label>
+        <select class="admin-form-select" id="anServico">
+          <option value="">Seleccionar...</option>
+        </select>
+      </div>
+      <div class="admin-form-field">
+        <label class="admin-form-label">Especialista</label>
+        <select class="admin-form-select" id="anEspecialista">
+          <option value="">Indiferente</option>
+        </select>
+      </div>
+      <div class="admin-form-field">
+        <label class="admin-form-label">Data</label>
+        <input class="admin-form-input" type="date" id="anData">
+      </div>
+      <div class="admin-form-field">
+        <label class="admin-form-label">Hora</label>
+        <select class="admin-form-select" id="anHora">
+          <option value="">Seleccionar...</option>
+          <option>09:00</option><option>10:00</option><option>11:00</option>
+          <option>12:00</option><option>13:00</option><option>14:00</option>
+          <option>15:00</option><option>16:00</option><option>17:00</option>
+          <option>18:00</option>
+        </select>
+      </div>
+      <div class="admin-form-field">
+        <label class="admin-form-label">Estado</label>
+        <select class="admin-form-select" id="anEstado">
+          <option value="confirmada">Confirmada</option>
+          <option value="pendente">Pendente</option>
+        </select>
+      </div>
+      <div class="admin-form-field full">
+        <label class="admin-form-label">Notas</label>
+        <input class="admin-form-input" type="text" id="anNotas" placeholder="opcional">
+      </div>
+    </div>
+    <div class="admin-modal-actions">
+      <button class="admin-modal-cancel" onclick="closeNewBooking()">Cancelar</button>
+      <button class="admin-modal-save" id="anSaveBtn" onclick="saveAdminBooking()">Guardar Marcação</button>
     </div>
   </div>
 </div>
@@ -354,7 +462,7 @@
     </div>
   </div>
   <div class="hero-badge">
-    <div><div class="hero-badge-stars">★★★★★</div><div class="hero-badge-num">5.0</div><div class="hero-badge-label">35 críticas</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="hero-badge-stars">★★★★★</div><div class="hero-badge-num">5.0</div><div class="hero-badge-label">35 críticas</div></div>
   </div>
   <div class="scroll-hint">Explorar</div>
 </section>
@@ -379,6 +487,22 @@
   </div>
 </section>
 
+<!-- GALERIA -->
+<section id="galeria">
+  <div class="fade-up">
+    <div class="section-tag">Galeria</div>
+    <h2 class="section-title">O nosso <em>trabalho</em></h2>
+  </div>
+  <div class="gallery-grid fade-up">
+    <div class="gallery-item large" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1519699903853-d0d5de0f7f51?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1617299099547-1e7a83e44ee2?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
+  </div>
+</section>
+
 <!-- SERVICOS -->
 <section id="servicos">
   <div class="services-header fade-up">
@@ -391,27 +515,11 @@
   <div class="services-grid fade-up" id="servicesGrid"></div>
 </section>
 
-<!-- GALERIA -->
-<section id="galeria">
-  <div class="fade-up">
-    <div class="section-tag">Galeria</div>
-    <h2 class="section-title">O nosso <em>trabalho</em></h2>
-  </div>
-  <div class="gallery-grid fade-up">
-    <div class="gallery-item large"><div class="gallery-placeholder">Fotografia principal</div><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">Coloração</div><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">Corte</div><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">Penteado</div><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">Tratamento</div><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item"><div class="gallery-placeholder">Interior</div><div class="gallery-overlay"><span>Ver</span></div></div>
-  </div>
-</section>
-
 <!-- EQUIPA -->
 <section id="equipa">
   <div class="fade-up">
     <div class="section-tag">A nossa equipa</div>
-    <h2 class="section-title">Profissionais<br><em>apaixonados</em></h2>
+    <h2 class="section-title">Especialistas<br><em>apaixonadas</em></h2>
     <div class="team-hint">✦ Clica numa especialista para a pré-seleccionar na marcação</div>
   </div>
   <div id="teamGrid" class="fade-up" style="color:var(--grey);font-style:italic;font-size:.85rem;margin-top:3rem">A carregar equipa...</div>
@@ -466,7 +574,7 @@
         </div>
         <div class="form-field">
           <label class="form-label">Data preferida</label>
-          <input class="form-input" type="date" id="fDate">
+          <input class="form-input" type="text" id="fDate" placeholder="Seleccionar data..." readonly style="cursor:pointer">
         </div>
         <div class="form-field">
           <label class="form-label">Hora preferida</label>
@@ -542,16 +650,25 @@ const SERVICOS = [
 ]
 
 /* ── render serviços ── */
+const SERVICE_IMGS = [
+  'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=500&q=80',
+  'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=500&q=80',
+  'https://images.unsplash.com/photo-1606921231106-f1083329a65c?w=500&q=80',
+  'https://images.unsplash.com/photo-1614703872704-3e47e6e4e97a?w=500&q=80',
+  'https://images.unsplash.com/photo-1519699903853-d0d5de0f7f51?w=500&q=80',
+  'https://images.unsplash.com/photo-1457972729786-0411a3b2b626?w=500&q=80',
+]
+
 function renderServices() {
   const grid = document.getElementById('servicesGrid')
   grid.innerHTML = SERVICOS.map((s,i) => `
     <div class="service-card" onclick="selectService('${s.nome}',this)" data-service="${s.nome}">
+      <div class="service-img" style="height:180px;overflow:hidden;margin:-3rem -2.5rem 1.5rem;"><img src="${SERVICE_IMGS[i]}" style="width:100%;height:100%;object-fit:cover;opacity:.5;transition:opacity .4s"></div>
       <span class="service-selected-badge">✦ seleccionado</span>
-      <div class="service-num">0${i+1}</div>
       <div class="service-name">${s.nome}</div>
       <div class="service-desc">${s.desc}</div>
       <div class="service-price">${s.preco}</div>
-      <div class="service-click-hint">Clica para seleccionar →</div>
+      <div class="service-click-hint">Clica para escolher especialista →</div>
     </div>`).join('')
   // Popular select
   const sel = document.getElementById('fService')
@@ -568,7 +685,7 @@ function selectService(nome, card) {
   document.getElementById('fService').value = nome
   document.getElementById('fServiceTag').style.display = 'inline'
   document.getElementById('fServiceField').classList.add('preselected')
-  document.getElementById('marcacoes').scrollIntoView({ behavior:'smooth' })
+  document.getElementById('equipa').scrollIntoView({ behavior:'smooth' })
 }
 
 /* ── EQUIPA dinâmica ── */
@@ -579,9 +696,9 @@ async function loadTeam() {
   const { data, error } = await sb.from('cabeleireiros').select('*').order('nome')
   if (error || !data || !data.length) {
     teamData = [
-      { id:null, nome:'Glória Godinho', especialidade:'Fundadora & Cabeleireira Sénior', foto_url:null },
-      { id:null, nome:'Especialista',   especialidade:'Cabeleireira & Colorista',        foto_url:null },
-      { id:null, nome:'Especialista',   especialidade:'Tratamentos & Beleza',            foto_url:null },
+      { id:null, nome:'Especialista', especialidade:'Cabeleireira Sénior',   foto_url:'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=80' },
+      { id:null, nome:'Especialista', especialidade:'Colorista & Balayage',  foto_url:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80' },
+      { id:null, nome:'Especialista', especialidade:'Tratamentos & Beleza',  foto_url:'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=400&q=80' },
     ]
   } else {
     teamData = data
@@ -619,7 +736,7 @@ function selectStylist(id, nome, card) {
     document.getElementById('fStylistTag').style.display = 'inline'
     document.getElementById('fStylistField').classList.add('preselected')
   }
-  document.getElementById('marcacoes').scrollIntoView({ behavior:'smooth' })
+  document.getElementById('equipa').scrollIntoView({ behavior:'smooth' })
 }
 
 /* ── SUBMISSÃO ── */
@@ -801,15 +918,170 @@ async function changeStatus(id, estado) {
   await loadBookings()
 }
 
+/* ═══ ADMIN — NOVA MARCAÇÃO ═══ */
+function openNewBooking() {
+  const selServico = document.getElementById('anServico')
+  const selEsp     = document.getElementById('anEspecialista')
+  if (selServico.options.length === 1) {
+    SERVICOS.forEach(s => { const o=document.createElement('option'); o.value=o.textContent=s.nome; selServico.appendChild(o) })
+  }
+  if (selEsp.options.length === 1) {
+    teamData.filter(t=>t.id).forEach(t => { const o=document.createElement('option'); o.value=t.id; o.textContent=t.nome; selEsp.appendChild(o) })
+  }
+  ['anNome','anTelefone','anEmail','anNotas'].forEach(id=>document.getElementById(id).value='')
+  selServico.value=''; selEsp.value='';
+  document.getElementById('anData').value=''
+  document.getElementById('anHora').value=''
+  document.getElementById('anEstado').value='confirmada'
+  document.getElementById('adminNewErr').style.display='none'
+  document.getElementById('adminNewModal').classList.add('open')
+}
+
+function closeNewBooking() {
+  document.getElementById('adminNewModal').classList.remove('open')
+}
+
+async function saveAdminBooking() {
+  const btn    = document.getElementById('anSaveBtn')
+  const errBox = document.getElementById('adminNewErr')
+  errBox.style.display = 'none'
+
+  const nome     = document.getElementById('anNome').value.trim()
+  const telefone = document.getElementById('anTelefone').value.trim()
+  const email    = document.getElementById('anEmail').value.trim()
+  const servico  = document.getElementById('anServico').value
+  const esp      = document.getElementById('anEspecialista').value
+  const data     = document.getElementById('anData').value
+  const hora     = document.getElementById('anHora').value
+  const estado   = document.getElementById('anEstado').value
+  const notas    = document.getElementById('anNotas').value.trim()
+
+  if (!data || !hora) {
+    errBox.textContent = 'Data e hora são obrigatórias.'
+    errBox.style.display = 'block'
+    return
+  }
+
+  btn.disabled = true; btn.textContent = 'A verificar...'
+
+  try {
+    // Anti-overbooking — mesma lógica do formulário público
+    const q = sb.from('marcacoes').select('id').eq('data',data).eq('hora',hora+':00').in('estado',['pendente','confirmada'])
+    if (esp) q.eq('cabeleireiro_id', parseInt(esp))
+    const { data: exist } = await q
+    if (exist && exist.length) {
+      errBox.textContent = 'Esse horário já está reservado. Escolhe outra hora ou especialista.'
+      errBox.style.display = 'block'
+      btn.disabled = false; btn.textContent = 'Guardar Marcação'
+      return
+    }
+
+    // Guardar marcação
+    const m = {
+      cliente_nome:     nome || 'Cliente (admin)',
+      cliente_email:    email || null,
+      cliente_telefone: telefone || null,
+      servico:          servico || 'Por definir',
+      data, hora: hora+':00',
+      notas: notas || null,
+      estado
+    }
+    if (esp) m.cabeleireiro_id = parseInt(esp)
+
+    const { error } = await sb.from('marcacoes').insert(m)
+    if (error) throw error
+
+    closeNewBooking()
+    await loadBookings()
+
+  } catch(e) {
+    errBox.textContent = 'Erro ao guardar. Tenta novamente.'
+    errBox.style.display = 'block'
+    console.error(e)
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar Marcação'
+  }
+}
+
 /* ── MISC ── */
 window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50))
-const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1})
+const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0, rootMargin:'0px 0px -50px 0px'})
 document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el))
+// Force check elements already in viewport on load
+setTimeout(() => {
+  document.querySelectorAll('.fade-up').forEach(el => {
+    const rect = el.getBoundingClientRect()
+    if(rect.top < window.innerHeight) el.classList.add('visible')
+  })
+}, 100)
 function toggleMenu(){const l=document.querySelector('.nav-links'),c=document.querySelector('.nav-cta'),o=l.style.display==='flex';l.style.cssText=o?'':'display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:#0a0a0a;padding:2rem;gap:1.5rem;';c.style.cssText=o?'':'display:block;text-align:center;margin:0 1.5rem 1.5rem;'}
 
 // Data mínima = amanhã
-const tmrw=new Date();tmrw.setDate(tmrw.getDate()+1)
-document.getElementById('fDate').min=tmrw.toISOString().slice(0,10)
+// ── FLATPICKR CALENDÁRIO ──
+async function getBookedDates() {
+  const { data } = await sb.from('marcacoes')
+    .select('data,hora,cabeleireiro_id')
+    .in('estado', ['pendente','confirmada'])
+  return data || []
+}
+
+let bookedSlots = []
+
+async function initCalendar() {
+  bookedSlots = await getBookedDates()
+
+  const bookedDates = [...new Set(bookedSlots.map(b => b.data))]
+
+  flatpickr('#fDate', {
+    locale: 'pt',
+    minDate: 'today',
+    disable: [
+      function(date) {
+        const day = date.getDay()
+        return day === 0 // Domingo fechado
+      }
+    ],
+    onDayCreate: function(dObj, dStr, fp, dayElem) {
+      const dateStr = dayElem.dateObj.toISOString().slice(0,10)
+      if (bookedDates.includes(dateStr)) {
+        dayElem.classList.add('booked')
+        dayElem.title = 'Dia com marcações'
+      }
+    },
+    onChange: function(selectedDates, dateStr) {
+      // Quando muda a data, actualiza as horas disponíveis
+      updateAvailableHours(dateStr)
+    },
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'D, d M Y',
+    disableMobile: true
+  })
+}
+
+function updateAvailableHours(dateStr) {
+  const sel = document.getElementById('fTime')
+  const stylist = document.getElementById('fStylist').value
+  const allHours = ['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00','18:00']
+
+  const occupiedHours = bookedSlots
+    .filter(b => b.data === dateStr && (!stylist || String(b.cabeleireiro_id) === String(stylist)))
+    .map(b => (b.hora||'').slice(0,5))
+
+  sel.innerHTML = '<option value="">Seleccionar...</option>'
+  allHours.forEach(h => {
+    const opt = document.createElement('option')
+    opt.value = h
+    opt.textContent = h
+    if (occupiedHours.includes(h)) {
+      opt.disabled = true
+      opt.textContent = h + ' (ocupado)'
+    }
+    sel.appendChild(opt)
+  })
+}
+
+initCalendar()
 
 // Init
 renderServices()
