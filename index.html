@@ -219,6 +219,11 @@
     .cal-dot.pendente { background:rgba(201,168,76,.7); }
     .cal-dot.confirmada { background:rgba(100,200,100,.7); }
     .cal-dot.cancelada { background:rgba(200,100,100,.4); }
+    .cal-booking-label { font-size:9px; padding:1px 4px; margin-bottom:1px; border-radius:2px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; line-height:1.4; }
+    .cal-booking-label.pendente { background:rgba(201,168,76,.2); color:var(--gold-light); border-left:2px solid var(--gold); }
+    .cal-booking-label.confirmada { background:rgba(100,200,100,.15); color:#7dc87d; border-left:2px solid #7dc87d; }
+    .cal-booking-label.cancelada { background:rgba(200,100,100,.1); color:#e08080; border-left:2px solid #e08080; text-decoration:line-through; }
+
     .admin-filter { display:flex; gap:.75rem; margin-bottom:1.5rem; flex-wrap:wrap; }
     .filter-btn { font-size:.5rem; letter-spacing:.15em; text-transform:uppercase; color:var(--grey); border:1px solid var(--border); background:none; padding:.4rem .9rem; cursor:pointer; font-family:'Montserrat',sans-serif; transition:all .3s; }
     .filter-btn:hover, .filter-btn.active { color:var(--gold); border-color:var(--border-h); }
@@ -494,12 +499,12 @@
     <h2 class="section-title">O nosso <em>trabalho</em></h2>
   </div>
   <div class="gallery-grid fade-up">
-    <div class="gallery-item large" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1519699903853-d0d5de0f7f51?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1617299099547-1e7a83e44ee2?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
-    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=500&q=80" style="width:100%;height:100%;object-fit:cover"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item large" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=900&q=80&auto=format&fit=crop" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='#161610'"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80&auto=format&fit=crop" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='#161610'"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&q=80&auto=format&fit=crop" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='#161610'"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80&auto=format&fit=crop" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='#161610'"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=600&q=80&auto=format&fit=crop" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='#161610'"><div class="gallery-overlay"><span>Ver</span></div></div>
+    <div class="gallery-item" style="overflow:hidden"><img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=600&q=80&auto=format&fit=crop" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.background='#161610'"><div class="gallery-overlay"><span>Ver</span></div></div>
   </div>
 </section>
 
@@ -651,19 +656,19 @@ const SERVICOS = [
 
 /* ── render serviços ── */
 const SERVICE_IMGS = [
-  'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=500&q=80',
-  'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=500&q=80',
-  'https://images.unsplash.com/photo-1606921231106-f1083329a65c?w=500&q=80',
-  'https://images.unsplash.com/photo-1614703872704-3e47e6e4e97a?w=500&q=80',
-  'https://images.unsplash.com/photo-1519699903853-d0d5de0f7f51?w=500&q=80',
-  'https://images.unsplash.com/photo-1457972729786-0411a3b2b626?w=500&q=80',
+  'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&q=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=600&q=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=600&q=80&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80&auto=format&fit=crop',
 ]
 
 function renderServices() {
   const grid = document.getElementById('servicesGrid')
   grid.innerHTML = SERVICOS.map((s,i) => `
     <div class="service-card" onclick="selectService('${s.nome}',this)" data-service="${s.nome}">
-      <div class="service-img" style="height:180px;overflow:hidden;margin:-3rem -2.5rem 1.5rem;"><img src="${SERVICE_IMGS[i]}" style="width:100%;height:100%;object-fit:cover;opacity:.5;transition:opacity .4s"></div>
+      <div class="service-img" style="height:180px;overflow:hidden;margin:-3rem -2.5rem 1.5rem;"><img src="${SERVICE_IMGS[i]}" style="width:100%;height:100%;object-fit:cover;opacity:.5;transition:opacity .4s" onerror="this.style.display='none'"></div>
       <span class="service-selected-badge">✦ seleccionado</span>
       <div class="service-name">${s.nome}</div>
       <div class="service-desc">${s.desc}</div>
@@ -692,16 +697,20 @@ function selectService(nome, card) {
 let teamData = []
 let selectedStylistId = null
 
+const TEAM_FALLBACK = [
+  { id:null, nome:'Especialista', especialidade:'Cabeleireira Sénior',  foto_url:'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=80&auto=format&fit=crop' },
+  { id:null, nome:'Especialista', especialidade:'Colorista & Balayage', foto_url:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80&auto=format&fit=crop' },
+  { id:null, nome:'Especialista', especialidade:'Tratamentos & Beleza', foto_url:'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=400&q=80&auto=format&fit=crop' },
+]
+
 async function loadTeam() {
-  const { data, error } = await sb.from('cabeleireiros').select('*').order('nome')
+  const { data, error } = await sb.from('cabeleireiros').select('*').eq('ativo', true).order('nome')
   if (error || !data || !data.length) {
-    teamData = [
-      { id:null, nome:'Especialista', especialidade:'Cabeleireira Sénior',   foto_url:'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=80' },
-      { id:null, nome:'Especialista', especialidade:'Colorista & Balayage',  foto_url:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80' },
-      { id:null, nome:'Especialista', especialidade:'Tratamentos & Beleza',  foto_url:'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=400&q=80' },
-    ]
+    teamData = TEAM_FALLBACK
   } else {
-    teamData = data
+    // só usa dados do Supabase se tiverem foto_url definido
+    const withPhotos = data.filter(t => t.foto_url)
+    teamData = withPhotos.length ? data : TEAM_FALLBACK
   }
   renderTeam()
   // Popular select
@@ -872,9 +881,15 @@ function renderCal() {
     const ds=`${calYear}-${String(calMonth_+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
     const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth_&&today.getDate()===d
     const isSel=calSelectedDate===ds
-    const dots=allBookings.filter(b=>b.data===ds).map(b=>`<div class="cal-dot ${b.estado}"></div>`).join('')
+    const dayBookings = allBookings.filter(b=>b.data===ds)
+    const labels = dayBookings.slice(0,3).map(b => {
+      const nome = b.cliente_nome ? b.cliente_nome.split(' ')[0] : '—'
+      const esp  = b.cabeleireiro_nome !== 'Indiferente' ? ` · ${b.cabeleireiro_nome.split(' ')[0]}` : ''
+      return `<div class="cal-booking-label ${b.estado}" onclick="event.stopPropagation();calSelectDay('${ds}')" title="${b.cliente_nome} — ${b.servico} (${(b.hora||'').slice(0,5)})">${nome}${esp}</div>`
+    }).join('')
+    const extra = dayBookings.length > 3 ? `<div style="font-size:9px;color:var(--grey-dark);padding:1px 4px">+${dayBookings.length-3}</div>` : ''
     html+=`<div class="cal-day${isToday?' today':''}${isSel?' selected':''}" onclick="calSelectDay('${ds}')">
-      <div class="cal-day-num">${d}</div><div class="cal-booking-dot">${dots}</div></div>`
+      <div class="cal-day-num">${d}</div><div class="cal-booking-dot" style="flex-direction:column;align-items:stretch">${labels}${extra}</div></div>`
   }
   document.getElementById('calGrid').innerHTML = html
 }
