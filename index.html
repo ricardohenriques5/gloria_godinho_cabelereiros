@@ -93,6 +93,8 @@
     .service-card.selected { outline:1px solid rgba(201,168,76,.25); }
     .service-selected-badge { position:absolute; top:1rem; right:1rem; font-size:.5rem; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); border:1px solid var(--border-h); padding:.3rem .6rem; opacity:0; transition:opacity .3s; }
     .service-card.selected .service-selected-badge { opacity:1; }
+    .service-num { font-family:'Cormorant Garamond',serif; font-size:4rem; font-weight:300; color:rgba(201,168,76,.1); line-height:1; margin-bottom:1rem; transition:color .4s; }
+    .service-card:hover .service-num, .service-card.selected .service-num { color:rgba(201,168,76,.2); }
     .service-name { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:400; color:var(--white); margin-bottom:.75rem; }
     .service-desc { font-size:.75rem; line-height:1.7; color:var(--grey); margin-bottom:1.5rem; }
     .service-price { font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--gold); font-style:italic; }
@@ -236,28 +238,6 @@
     .bk-btn.cancel:hover { background:rgba(200,100,100,.1); }
     .no-bookings { text-align:center; color:var(--grey); font-size:.8rem; font-style:italic; padding:3rem; }
 
-
-    /* ADMIN — nova marcação modal */
-    .admin-new-btn { font-size:.55rem; letter-spacing:.2em; text-transform:uppercase; color:var(--black); background:var(--gold); border:none; padding:.5rem 1.2rem; cursor:pointer; font-family:'Montserrat',sans-serif; transition:background .3s; }
-    .admin-new-btn:hover { background:var(--gold-light); }
-    .admin-modal-overlay { display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,.75); align-items:center; justify-content:center; }
-    .admin-modal-overlay.open { display:flex; }
-    .admin-modal { background:var(--black-soft); border:1px solid var(--border-h); padding:2.5rem; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; }
-    .admin-modal-title { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:300; color:var(--gold-light); margin-bottom:2rem; }
-    .admin-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:1px; }
-    .admin-form-field { background:var(--black-card); padding:1rem 1.25rem; }
-    .admin-form-field.full { grid-column:span 2; }
-    .admin-form-label { display:block; font-size:.5rem; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:.35rem; }
-    .admin-form-input, .admin-form-select { width:100%; background:transparent; border:none; outline:none; color:var(--white); font-family:'Montserrat',sans-serif; font-size:.85rem; font-weight:300; }
-    .admin-form-select option { background:#111; color:var(--white); }
-    .admin-modal-actions { display:flex; gap:.75rem; margin-top:1px; }
-    .admin-modal-save { flex:1; background:var(--gold); color:var(--black); border:none; padding:1rem; font-family:'Montserrat',sans-serif; font-size:.6rem; letter-spacing:.25em; text-transform:uppercase; cursor:pointer; transition:background .3s; }
-    .admin-modal-save:hover { background:var(--gold-light); }
-    .admin-modal-save:disabled { opacity:.5; cursor:not-allowed; }
-    .admin-modal-cancel { background:none; color:var(--grey); border:1px solid var(--border); padding:1rem 1.5rem; font-family:'Montserrat',sans-serif; font-size:.6rem; letter-spacing:.25em; text-transform:uppercase; cursor:pointer; transition:all .3s; }
-    .admin-modal-cancel:hover { color:var(--white); border-color:var(--border-h); }
-    .admin-modal-err { display:none; font-size:.75rem; color:#e88; padding:.75rem 1rem; background:rgba(180,50,50,.1); border:1px solid rgba(180,50,50,.3); margin-bottom:1px; }
-
     /* ANIMATIONS */
     .fade-up { opacity:0; transform:translateY(30px); transition:opacity .8s ease,transform .8s ease; }
     .fade-up.visible { opacity:1; transform:translateY(0); }
@@ -327,10 +307,7 @@
         <button onclick="calNext()">›</button>
       </div>
       <div class="cal-grid" id="calGrid"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
-        <div class="admin-section-title" style="margin-bottom:0">Marcações</div>
-        <button class="admin-new-btn" onclick="openNewBooking()">+ Nova Marcação</button>
-      </div>
+      <div class="admin-section-title">Marcações</div>
       <div class="admin-filter">
         <button class="filter-btn active" onclick="filterBookings('todas',this)">Todas</button>
         <button class="filter-btn" onclick="filterBookings('pendente',this)">Pendentes</button>
@@ -342,70 +319,6 @@
         <tbody id="bookingsBody"></tbody>
       </table>
       <div class="no-bookings" id="noBookings" style="display:none">Sem marcações para mostrar.</div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ADMIN MODAL — nova marcação -->
-<div class="admin-modal-overlay" id="adminNewModal">
-  <div class="admin-modal">
-    <div class="admin-modal-title">Nova Marcação</div>
-    <div class="admin-modal-err" id="adminNewErr"></div>
-    <div class="admin-form-grid">
-      <div class="admin-form-field full">
-        <label class="admin-form-label">Nome do cliente</label>
-        <input class="admin-form-input" type="text" id="anNome" placeholder="Nome (opcional)">
-      </div>
-      <div class="admin-form-field">
-        <label class="admin-form-label">Telefone</label>
-        <input class="admin-form-input" type="tel" id="anTelefone" placeholder="opcional">
-      </div>
-      <div class="admin-form-field">
-        <label class="admin-form-label">Email</label>
-        <input class="admin-form-input" type="email" id="anEmail" placeholder="opcional">
-      </div>
-      <div class="admin-form-field">
-        <label class="admin-form-label">Serviço</label>
-        <select class="admin-form-select" id="anServico">
-          <option value="">Seleccionar...</option>
-        </select>
-      </div>
-      <div class="admin-form-field">
-        <label class="admin-form-label">Especialista</label>
-        <select class="admin-form-select" id="anEspecialista">
-          <option value="">Indiferente</option>
-        </select>
-      </div>
-      <div class="admin-form-field">
-        <label class="admin-form-label">Data</label>
-        <input class="admin-form-input" type="date" id="anData">
-      </div>
-      <div class="admin-form-field">
-        <label class="admin-form-label">Hora</label>
-        <select class="admin-form-select" id="anHora">
-          <option value="">Seleccionar...</option>
-          <option>09:00</option><option>10:00</option><option>11:00</option>
-          <option>12:00</option><option>13:00</option><option>14:00</option>
-          <option>15:00</option><option>16:00</option><option>17:00</option>
-          <option>18:00</option>
-        </select>
-      </div>
-      <div class="admin-form-field">
-        <label class="admin-form-label">Estado</label>
-        <select class="admin-form-select" id="anEstado">
-          <option value="confirmada">Confirmada</option>
-          <option value="pendente">Pendente</option>
-        </select>
-      </div>
-      <div class="admin-form-field full">
-        <label class="admin-form-label">Notas</label>
-        <input class="admin-form-input" type="text" id="anNotas" placeholder="opcional">
-      </div>
-    </div>
-    <div class="admin-modal-actions">
-      <button class="admin-modal-cancel" onclick="closeNewBooking()">Cancelar</button>
-      <button class="admin-modal-save" id="anSaveBtn" onclick="saveAdminBooking()">Guardar Marcação</button>
     </div>
   </div>
 </div>
@@ -634,10 +547,11 @@ function renderServices() {
   grid.innerHTML = SERVICOS.map((s,i) => `
     <div class="service-card" onclick="selectService('${s.nome}',this)" data-service="${s.nome}">
       <span class="service-selected-badge">✦ seleccionado</span>
+      <div class="service-num">0${i+1}</div>
       <div class="service-name">${s.nome}</div>
       <div class="service-desc">${s.desc}</div>
       <div class="service-price">${s.preco}</div>
-      <div class="service-click-hint">Clica para escolher especialista →</div>
+      <div class="service-click-hint">Clica para seleccionar →</div>
     </div>`).join('')
   // Popular select
   const sel = document.getElementById('fService')
@@ -654,7 +568,7 @@ function selectService(nome, card) {
   document.getElementById('fService').value = nome
   document.getElementById('fServiceTag').style.display = 'inline'
   document.getElementById('fServiceField').classList.add('preselected')
-  document.getElementById('equipa').scrollIntoView({ behavior:'smooth' })
+  document.getElementById('marcacoes').scrollIntoView({ behavior:'smooth' })
 }
 
 /* ── EQUIPA dinâmica ── */
@@ -705,7 +619,7 @@ function selectStylist(id, nome, card) {
     document.getElementById('fStylistTag').style.display = 'inline'
     document.getElementById('fStylistField').classList.add('preselected')
   }
-  document.getElementById('equipa').scrollIntoView({ behavior:'smooth' })
+  document.getElementById('marcacoes').scrollIntoView({ behavior:'smooth' })
 }
 
 /* ── SUBMISSÃO ── */
@@ -887,96 +801,10 @@ async function changeStatus(id, estado) {
   await loadBookings()
 }
 
-/* ═══ ADMIN — NOVA MARCAÇÃO ═══ */
-function openNewBooking() {
-  const selServico = document.getElementById('anServico')
-  const selEsp     = document.getElementById('anEspecialista')
-  if (selServico.options.length === 1) {
-    SERVICOS.forEach(s => { const o=document.createElement('option'); o.value=o.textContent=s.nome; selServico.appendChild(o) })
-  }
-  if (selEsp.options.length === 1) {
-    teamData.filter(t=>t.id).forEach(t => { const o=document.createElement('option'); o.value=t.id; o.textContent=t.nome; selEsp.appendChild(o) })
-  }
-  ['anNome','anTelefone','anEmail','anNotas'].forEach(id=>document.getElementById(id).value='')
-  selServico.value=''; selEsp.value='';
-  document.getElementById('anData').value=''
-  document.getElementById('anHora').value=''
-  document.getElementById('anEstado').value='confirmada'
-  document.getElementById('adminNewErr').style.display='none'
-  document.getElementById('adminNewModal').classList.add('open')
-}
-
-function closeNewBooking() {
-  document.getElementById('adminNewModal').classList.remove('open')
-}
-
-async function saveAdminBooking() {
-  const btn    = document.getElementById('anSaveBtn')
-  const errBox = document.getElementById('adminNewErr')
-  errBox.style.display = 'none'
-
-  const nome     = document.getElementById('anNome').value.trim()
-  const telefone = document.getElementById('anTelefone').value.trim()
-  const email    = document.getElementById('anEmail').value.trim()
-  const servico  = document.getElementById('anServico').value
-  const esp      = document.getElementById('anEspecialista').value
-  const data     = document.getElementById('anData').value
-  const hora     = document.getElementById('anHora').value
-  const estado   = document.getElementById('anEstado').value
-  const notas    = document.getElementById('anNotas').value.trim()
-
-  if (!data || !hora) {
-    errBox.textContent = 'Data e hora são obrigatórias.'
-    errBox.style.display = 'block'
-    return
-  }
-
-  btn.disabled = true; btn.textContent = 'A verificar...'
-
-  try {
-    // Anti-overbooking — mesma lógica do formulário público
-    const q = sb.from('marcacoes').select('id').eq('data',data).eq('hora',hora+':00').in('estado',['pendente','confirmada'])
-    if (esp) q.eq('cabeleireiro_id', parseInt(esp))
-    const { data: exist } = await q
-    if (exist && exist.length) {
-      errBox.textContent = 'Esse horário já está reservado. Escolhe outra hora ou especialista.'
-      errBox.style.display = 'block'
-      btn.disabled = false; btn.textContent = 'Guardar Marcação'
-      return
-    }
-
-    // Guardar marcação
-    const m = {
-      cliente_nome:     nome || 'Cliente (admin)',
-      cliente_email:    email || null,
-      cliente_telefone: telefone || null,
-      servico:          servico || 'Por definir',
-      data, hora: hora+':00',
-      notas: notas || null,
-      estado
-    }
-    if (esp) m.cabeleireiro_id = parseInt(esp)
-
-    const { error } = await sb.from('marcacoes').insert(m)
-    if (error) throw error
-
-    closeNewBooking()
-    await loadBookings()
-
-  } catch(e) {
-    errBox.textContent = 'Erro ao guardar. Tenta novamente.'
-    errBox.style.display = 'block'
-    console.error(e)
-  } finally {
-    btn.disabled = false; btn.textContent = 'Guardar Marcação'
-  }
-}
-
 /* ── MISC ── */
 window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50))
-const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0, rootMargin:'0px 0px -50px 0px'})
+const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1})
 document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el))
-setTimeout(() => { document.querySelectorAll('.fade-up').forEach(el => { const rect = el.getBoundingClientRect(); if(rect.top < window.innerHeight) el.classList.add('visible') }) }, 100)
 function toggleMenu(){const l=document.querySelector('.nav-links'),c=document.querySelector('.nav-cta'),o=l.style.display==='flex';l.style.cssText=o?'':'display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:#0a0a0a;padding:2rem;gap:1.5rem;';c.style.cssText=o?'':'display:block;text-align:center;margin:0 1.5rem 1.5rem;'}
 
 // Data mínima = amanhã
