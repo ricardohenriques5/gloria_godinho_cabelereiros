@@ -529,7 +529,7 @@
   <div class="fade-up">
     <div class="section-tag">A nossa equipa</div>
     <h2 class="section-title">Especialistas<br><em>apaixonadas</em></h2>
-    <div class="team-hint">✦ Clica numa especialista para a pré-seleccionar na marcação</div>
+    <div class="team-hint">✦ Clica numa Cabelereira para a pré-seleccionar na marcação</div>
   </div>
   <div id="teamGrid" class="fade-up" style="color:var(--grey);font-style:italic;font-size:.85rem;margin-top:3rem">A carregar equipa...</div>
 </section>
@@ -663,8 +663,8 @@ const SERVICE_IMGS = [
   'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&h=300&fit=crop&crop=center',
   'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=300&fit=crop&crop=center',
   'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=600&h=300&fit=crop&crop=center',
-  'https://images.unsplash.com/photo-1560869713-7d0a29430803?w=600&h=300&fit=crop&crop=center',
   'https://images.unsplash.com/photo-1522337660988-7b136602e184?w=600&h=300&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1560869713-7d0a29430803?w=600&h=300&fit=crop&crop=center',
   'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=300&fit=crop&crop=center'
 ]
 
@@ -702,9 +702,9 @@ let teamData = []
 let selectedStylistId = null
 
 const TEAM_FALLBACK = [
-  { id:null, nome:'Especialista', especialidade:'Cabeleireira Sénior',  foto_url:'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=80&auto=format&fit=crop' },
-  { id:null, nome:'Especialista', especialidade:'Colorista & Balayage', foto_url:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80&auto=format&fit=crop' },
-  { id:null, nome:'Especialista', especialidade:'Tratamentos & Beleza', foto_url:'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=400&q=80&auto=format&fit=crop' },
+  { id:null, nome:'Sofia', especialidade:'Penteados & Alisamentos',  foto_url:'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&q=80&auto=format&fit=crop' },
+  { id:null, nome:'Mónica', especialidade:'Colorista & Balayage', foto_url:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80&auto=format&fit=crop' },
+  { id:null, nome:'Filipa', especialidade:'Tratamentos & Beleza', foto_url:'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=400&q=80&auto=format&fit=crop' },
 ]
 
 async function loadTeam() {
@@ -749,7 +749,7 @@ function selectStylist(id, nome, card) {
     document.getElementById('fStylistTag').style.display = 'inline'
     document.getElementById('fStylistField').classList.add('preselected')
   }
-  document.getElementById('equipa').scrollIntoView({ behavior:'smooth' })
+  document.getElementById('marcacoes').scrollIntoView({ behavior:'smooth' })
 }
 
 /* ── SUBMISSÃO ── */
