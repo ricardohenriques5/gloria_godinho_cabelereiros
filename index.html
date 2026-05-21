@@ -200,7 +200,10 @@
     .booking-cols { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2.5rem; }
 
     /* Cabeleireiras list */
-    .team-select-list { display:flex; flex-direction:column; gap:8px; }
+    .team-select-list { display:flex; flex-direction:column; gap:8px; max-height:320px; overflow-y:auto; padding-right:4px; scrollbar-width:thin; scrollbar-color:var(--nude) transparent; }
+    .team-select-list::-webkit-scrollbar { width:4px; }
+    .team-select-list::-webkit-scrollbar-track { background:transparent; }
+    .team-select-list::-webkit-scrollbar-thumb { background:var(--nude); border-radius:2px; }
     .team-btn {
       display:flex; align-items:center; gap:1rem; padding:.85rem 1rem;
       background:var(--white); border:1.5px solid var(--border); border-radius:4px;
@@ -379,6 +382,44 @@
     .admin-modal-cancel:hover { color:var(--dark); border-color:var(--sand); }
     .admin-modal-err { display:none; font-size:.75rem; color:#c44; padding:.65rem 1rem; background:rgba(200,80,80,.08); border:1px solid rgba(200,80,80,.2); border-radius:2px; margin-bottom:8px; }
 
+
+    /* ── LIGHTBOX ── */
+    .lightbox-overlay {
+      display:none; position:fixed; inset:0; z-index:500;
+      background:rgba(61,43,31,.92); backdrop-filter:blur(8px);
+      align-items:center; justify-content:center; padding:1.5rem;
+    }
+    .lightbox-overlay.open { display:flex; }
+    .lightbox-img-wrap {
+      position:relative; max-width:90vw; max-height:85vh;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .lightbox-img-wrap img {
+      max-width:100%; max-height:85vh; object-fit:contain;
+      border-radius:4px; box-shadow:0 20px 60px rgba(0,0,0,.5);
+    }
+    .lightbox-close {
+      position:absolute; top:-2.5rem; right:0;
+      background:none; border:none; color:var(--nude);
+      font-size:1.8rem; cursor:pointer; line-height:1;
+      transition:color .2s;
+    }
+    .lightbox-close:hover { color:var(--white); }
+    .lightbox-prev, .lightbox-next {
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(250,246,240,.15); border:1px solid rgba(250,246,240,.3);
+      color:var(--nude); font-size:1.2rem; width:40px; height:40px;
+      border-radius:50%; cursor:pointer; transition:all .2s;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .lightbox-prev:hover, .lightbox-next:hover { background:rgba(250,246,240,.3); color:var(--white); }
+    .lightbox-prev { left:-3rem; }
+    .lightbox-next { right:-3rem; }
+    @media(max-width:600px) {
+      .lightbox-prev { left:-.5rem; }
+      .lightbox-next { right:-.5rem; }
+    }
+
     /* Animations */
     .fade-up { opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
     .fade-up.visible { opacity:1; transform:translateY(0); }
@@ -398,6 +439,17 @@
   </style>
 </head>
 <body>
+
+
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-img-wrap">
+    <button class="lightbox-close" onclick="closeLightboxBtn()">×</button>
+    <button class="lightbox-prev" onclick="lightboxNav(-1,event)">‹</button>
+    <img id="lightboxImg" src="" alt="">
+    <button class="lightbox-next" onclick="lightboxNav(1,event)">›</button>
+  </div>
+</div>
 
 <!-- ADMIN NEW BOOKING MODAL -->
 <div class="admin-modal-overlay" id="adminNewModal">
@@ -489,7 +541,6 @@
   <a href="#sobre" onclick="toggleMenu()">Sobre</a>
   <a href="#galeria" onclick="toggleMenu()">Galeria</a>
   <a href="#marcacoes" onclick="toggleMenu()">Fazer Marcação</a>
-  <a href="#equipa" onclick="toggleMenu()">Equipa</a>
   <a href="#contacto" onclick="toggleMenu()">Contacto</a>
   <a href="#" onclick="openAdmin(event);toggleMenu()">Admin</a>
 </div>
@@ -542,14 +593,14 @@
     <h2 class="section-title">O nosso <em>trabalho</em></h2>
   </div>
   <div class="gallery-grid fade-up">
-    <div class="gallery-cell"><img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
-    <div class="gallery-cell"><img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
-    <div class="gallery-cell"><img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
-    <div class="gallery-cell"><img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
-    <div class="gallery-cell"><img src="https://images.unsplash.com/photo-1619451334792-150fd785ee74?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
-    <div class="gallery-cell"><img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
-    <div class="gallery-cell"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
-    <div class="gallery-cell"><img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
+    <div class="gallery-cell" onclick="openLightbox(this)" style="cursor:pointer"><img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
+    <div class="gallery-cell" onclick="openLightbox(this)" style="cursor:pointer"><img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
+    <div class="gallery-cell" onclick="openLightbox(this)" style="cursor:pointer"><img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
+    <div class="gallery-cell" onclick="openLightbox(this)" style="cursor:pointer"><img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
+    <div class="gallery-cell" onclick="openLightbox(this)" style="cursor:pointer"><img src="https://images.unsplash.com/photo-1619451334792-150fd785ee74?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
+    <div class="gallery-cell" onclick="openLightbox(this)" style="cursor:pointer"><img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
+    <div class="gallery-cell" onclick="openLightbox(this)" style="cursor:pointer"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
+    <div class="gallery-cell" onclick="openLightbox(this)" style="cursor:pointer"><img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=500&h=500&fit=crop&crop=center" alt=""><div class="gallery-cell-overlay"><span>Ver</span></div></div>
   </div>
 </section>
 
@@ -606,14 +657,6 @@
 </section>
 
 <!-- EQUIPA -->
-<section id="equipa">
-  <div class="fade-up">
-    <div class="section-label">A nossa equipa</div>
-    <h2 class="section-title">As nossas <em>especialistas</em></h2>
-  </div>
-  <div class="team-grid fade-up" id="teamGrid"></div>
-</section>
-
 <!-- CONTACTO -->
 <footer id="contacto">
   <div class="contact-grid fade-up">
@@ -737,6 +780,7 @@ function renderTeamSelect() {
 
 function renderTeamSection() {
   const grid = document.getElementById('teamGrid')
+  if (!grid) return
   grid.innerHTML = teamData.map(t => `
     <div class="team-card">
       <div class="team-photo">
@@ -762,7 +806,9 @@ function selectStylist(id, nome, btn) {
 }
 
 function scrollToForm() {
-  document.getElementById('bookingFormWrap').scrollIntoView({ behavior:'smooth', block:'start' })
+  const el = document.getElementById('bookingFormWrap')
+  const y = el.getBoundingClientRect().top + window.scrollY - (window.innerHeight/2 - el.offsetHeight/2)
+  window.scrollTo({ top: Math.max(0,y), behavior:'smooth' })
 }
 
 /* ── CALENDÁRIO FLATPICKR ── */
@@ -966,6 +1012,46 @@ async function saveAdminBooking(){
   }catch(e){errBox.textContent='Erro ao guardar.';errBox.style.display='block';console.error(e)}
   finally{btn.disabled=false;btn.textContent='Guardar Marcação'}
 }
+
+
+/* ── LIGHTBOX ── */
+let lightboxImgs = []
+let lightboxIdx = 0
+
+function openLightbox(cell) {
+  const allCells = Array.from(document.querySelectorAll('.gallery-cell img'))
+  lightboxImgs = allCells.map(img => img.src)
+  const clickedImg = cell.querySelector ? cell.querySelector('img') : cell
+  lightboxIdx = allCells.indexOf(clickedImg)
+  if (lightboxIdx < 0) lightboxIdx = 0
+  document.getElementById('lightboxImg').src = lightboxImgs[lightboxIdx]
+  document.getElementById('lightbox').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+
+function closeLightbox(e) {
+  if (e.target === document.getElementById('lightbox')) {
+    closeLightboxBtn()
+  }
+}
+
+function closeLightboxBtn() {
+  document.getElementById('lightbox').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+function lightboxNav(dir, e) {
+  e.stopPropagation()
+  lightboxIdx = (lightboxIdx + dir + lightboxImgs.length) % lightboxImgs.length
+  document.getElementById('lightboxImg').src = lightboxImgs[lightboxIdx]
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return
+  if (e.key === 'Escape') closeLightboxBtn()
+  if (e.key === 'ArrowLeft') lightboxNav(-1, {stopPropagation:()=>{}})
+  if (e.key === 'ArrowRight') lightboxNav(1, {stopPropagation:()=>{}})
+})
 
 /* ── MISC ── */
 window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50))
