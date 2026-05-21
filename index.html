@@ -260,7 +260,9 @@
     .form-success { display:none; text-align:center; padding:2.5rem 1rem; }
     .form-success.show { display:block; }
     .form-success-icon { font-family:'Playfair Display',serif; font-size:2.5rem; color:var(--terracotta); margin-bottom:.75rem; }
-    .form-success p { font-size:.85rem; color:var(--text-s); line-height:1.7; }
+    .form-success p { font-size:.85rem; color:var(--text-s); line-height:1.7; margin-bottom:1.5rem; }
+    .btn-nova-marcacao { display:inline-block; font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--white); background:var(--gold); padding:.85rem 2rem; border:none; border-radius:2px; cursor:pointer; font-family:'Jost',sans-serif; transition:background .3s; margin-top:.5rem; }
+    .btn-nova-marcacao:hover { background:var(--gold-h); }
 
     /* Flatpickr nude theme */
     .flatpickr-calendar { background:var(--white) !important; border:1px solid var(--nude) !important; border-radius:4px !important; box-shadow:var(--shadow) !important; font-family:'Jost',sans-serif !important; }
@@ -296,13 +298,13 @@
     .footer-copy { font-size:.55rem; color:var(--text-s); letter-spacing:.08em; }
 
     /* ── ADMIN OVERLAY ── */
-    #adminOverlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(61,43,31,.95); overflow-y:auto; }
+    #adminOverlay { display:none; position:fixed; inset:0; z-index:1000; background:#130b05; overflow-y:auto; }
     #adminOverlay.open { display:block; }
-    .admin-wrap { max-width:1100px; margin:0 auto; padding:3rem 1.5rem; }
+    .admin-wrap { max-width:1100px; margin:0 auto; padding:3rem 1.5rem; color:#e8d0b0; }
     #adminLogin { max-width:380px; margin:6rem auto; }
     .admin-login-logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--nude); text-align:center; margin-bottom:.25rem; }
     .admin-login-sub { font-size:.5rem; letter-spacing:.25em; text-transform:uppercase; color:var(--sand); text-align:center; margin-bottom:2.5rem; }
-    .admin-input { width:100%; background:rgba(250,246,240,.08); border:1px solid rgba(196,149,106,.3); padding:1rem 1.25rem; color:var(--cream); font-family:'Jost',sans-serif; font-size:.85rem; outline:none; margin-bottom:1px; display:block; transition:border-color .3s; }
+    .admin-input { width:100%; background:rgba(255,255,255,.07); border:1px solid rgba(196,149,106,.4); padding:1rem 1.25rem; color:#f5e8d5; font-family:'Jost',sans-serif; font-size:.85rem; outline:none; margin-bottom:1px; display:block; transition:border-color .3s; }
     .admin-input:focus { border-color:rgba(196,149,106,.7); }
     .admin-input::placeholder { color:var(--sand); }
     .admin-login-btn { width:100%; margin-top:8px; background:var(--gold); color:var(--white); border:none; padding:1rem; font-family:'Jost',sans-serif; font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; cursor:pointer; transition:background .3s; }
@@ -316,7 +318,7 @@
     .admin-logout:hover { color:var(--nude); border-color:rgba(196,149,106,.6); }
     .admin-close { font-size:.5rem; letter-spacing:.15em; text-transform:uppercase; color:var(--dark); background:var(--gold); border:none; padding:.45rem .9rem; cursor:pointer; font-family:'Jost',sans-serif; }
     .admin-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(196,149,106,.15); margin-bottom:2.5rem; }
-    .admin-stat { background:rgba(61,43,31,.5); padding:1.25rem; text-align:center; }
+    .admin-stat { background:#1e0f07; padding:1.25rem; text-align:center; border:1px solid rgba(196,149,106,.12); }
     .admin-stat-num { font-family:'Playfair Display',serif; font-size:2.2rem; color:var(--nude); line-height:1; }
     .admin-stat-label { font-size:.45rem; letter-spacing:.2em; text-transform:uppercase; color:var(--sand); margin-top:.3rem; }
     .admin-section-title { font-size:.5rem; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:1.25rem; display:flex; align-items:center; gap:.75rem; }
@@ -326,11 +328,11 @@
     .cal-nav button:hover { border-color:var(--gold); color:var(--gold); }
     .cal-month { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--nude); }
     .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:rgba(196,149,106,.15); margin-bottom:2.5rem; }
-    .cal-day-label { background:rgba(61,43,31,.5); padding:.4rem; text-align:center; font-size:.45rem; letter-spacing:.1em; text-transform:uppercase; color:var(--sand); }
-    .cal-day { background:rgba(61,43,31,.3); padding:.5rem .35rem; min-height:65px; cursor:pointer; transition:background .2s; }
-    .cal-day:hover { background:rgba(61,43,31,.5); }
+    .cal-day-label { background:#1e0f07; padding:.4rem; text-align:center; font-size:.45rem; letter-spacing:.1em; text-transform:uppercase; color:var(--sand); }
+    .cal-day { background:#1a0d06; padding:.5rem .35rem; min-height:65px; cursor:pointer; transition:background .2s; border:1px solid rgba(196,149,106,.06); }
+    .cal-day:hover { background:#2e1a0e; }
     .cal-day.today { outline:1px solid rgba(196,149,106,.4); }
-    .cal-day.selected { background:rgba(61,43,31,.6); outline:1px solid var(--gold); }
+    .cal-day.selected { background:#2e1a0e; outline:1px solid var(--gold); }
     .cal-day.other-month { opacity:.3; }
     .cal-day-num { font-size:.65rem; color:var(--sand); margin-bottom:.2rem; }
     .cal-day.today .cal-day-num { color:var(--gold); }
@@ -343,8 +345,8 @@
     .filter-btn:hover, .filter-btn.active { color:var(--gold); border-color:var(--gold); }
     .bookings-table { width:100%; border-collapse:collapse; }
     .bookings-table th { text-align:left; font-size:.45rem; letter-spacing:.18em; text-transform:uppercase; color:var(--sand); padding:.65rem .9rem; border-bottom:1px solid rgba(196,149,106,.2); font-weight:400; }
-    .bookings-table td { padding:.8rem .9rem; border-bottom:1px solid rgba(196,149,106,.08); font-size:.78rem; color:var(--sand); vertical-align:middle; }
-    .bookings-table tr:hover td { color:var(--nude); }
+    .bookings-table td { padding:.8rem .9rem; border-bottom:1px solid rgba(196,149,106,.12); font-size:.78rem; color:#d4a87a; vertical-align:middle; }
+    .bookings-table tr:hover td { color:var(--cream); }
     .bk-name { color:var(--nude) !important; font-weight:500; }
     .bk-service { color:var(--gold) !important; font-family:'Playfair Display',serif; font-size:.95rem; }
     .badge { display:inline-block; font-size:.4rem; letter-spacing:.12em; text-transform:uppercase; padding:.2rem .5rem; }
@@ -391,12 +393,13 @@
     }
     .lightbox-overlay.open { display:flex; }
     .lightbox-img-wrap {
-      position:relative; max-width:90vw; max-height:85vh;
+      position:relative; max-width:95vw; max-height:92vh;
       display:flex; align-items:center; justify-content:center;
     }
     .lightbox-img-wrap img {
-      max-width:100%; max-height:85vh; object-fit:contain;
-      border-radius:4px; box-shadow:0 20px 60px rgba(0,0,0,.5);
+      max-width:95vw; max-height:92vh; width:auto; height:auto;
+      object-fit:contain; border-radius:4px;
+      box-shadow:0 20px 60px rgba(0,0,0,.7);
     }
     .lightbox-close {
       position:absolute; top:-2.5rem; right:0;
@@ -652,6 +655,7 @@
     <div class="form-success" id="formSuccess">
       <div class="form-success-icon">✦</div>
       <p id="successDetail">Pedido enviado com sucesso!</p>
+      <button class="btn-nova-marcacao" onclick="resetBookingForm()">+ Nova Marcação</button>
     </div>
   </div>
 </section>
@@ -882,7 +886,7 @@ async function enviarEmail(payload){
 let allBookings=[]
 let calYear,calMonth_,calSelectedDate=null
 
-function openAdmin(e){if(e)e.preventDefault();document.getElementById('adminOverlay').classList.add('open');document.body.style.overflow='hidden'}
+async function openAdmin(e){if(e)e.preventDefault();document.getElementById('adminOverlay').classList.add('open');document.body.style.overflow='hidden';const{data:{session}}=await sb.auth.getSession();if(session)showAdminDash();else showAdminLogin()}
 function closeAdmin(){document.getElementById('adminOverlay').classList.remove('open');document.body.style.overflow=''}
 
 async function adminLogin(){
@@ -892,12 +896,19 @@ async function adminLogin(){
   err.style.display='none'
   const{error}=await sb.auth.signInWithPassword({email,password:pass})
   if(error){err.textContent='Credenciais incorrectas.';err.style.display='block';return}
+  showAdminDash()
+}
+function showAdminDash(){
   document.getElementById('adminLogin').style.display='none'
   document.getElementById('adminDash').style.display='block'
   const now=new Date();calYear=now.getFullYear();calMonth_=now.getMonth()
-  await loadBookings();renderCal()
+  loadBookings();renderCal()
 }
-async function adminLogout(){await sb.auth.signOut();document.getElementById('adminDash').style.display='none';document.getElementById('adminLogin').style.display='block'}
+function showAdminLogin(){
+  document.getElementById('adminDash').style.display='none'
+  document.getElementById('adminLogin').style.display='block'
+}
+async function adminLogout(){await sb.auth.signOut();showAdminLogin()}
 
 async function loadBookings(){
   const{data}=await sb.from('marcacoes').select('*, cabeleireiros(nome)').order('data',{ascending:false}).order('hora',{ascending:true})
@@ -1020,7 +1031,7 @@ let lightboxIdx = 0
 
 function openLightbox(cell) {
   const allCells = Array.from(document.querySelectorAll('.gallery-cell img'))
-  lightboxImgs = allCells.map(img => img.src)
+  lightboxImgs = allCells.map(img => img.src.replace('w=500&h=500','w=1400&h=1000'))
   const clickedImg = cell.querySelector ? cell.querySelector('img') : cell
   lightboxIdx = allCells.indexOf(clickedImg)
   if (lightboxIdx < 0) lightboxIdx = 0
@@ -1052,6 +1063,33 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') lightboxNav(-1, {stopPropagation:()=>{}})
   if (e.key === 'ArrowRight') lightboxNav(1, {stopPropagation:()=>{}})
 })
+
+
+function resetBookingForm() {
+  // Reset selects de serviço e cabeleireira
+  document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('selected'))
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'))
+  selectedStylistId = null
+  // Reset campos
+  ;['fName','fPhone','fEmail','fNotes'].forEach(id => document.getElementById(id).value = '')
+  document.getElementById('fService').value = ''
+  document.getElementById('fStylist').value = ''
+  document.getElementById('fServiceTag').style.display = 'none'
+  document.getElementById('fStylistTag').style.display = 'none'
+  document.getElementById('fServiceGroup').classList.remove('preselected')
+  document.getElementById('fStylistGroup').classList.remove('preselected')
+  // Reset flatpickr
+  const fp = document.querySelector('#fDate')._flatpickr
+  if (fp) fp.clear()
+  document.getElementById('fTime').value = ''
+  document.getElementById('fError').style.display = 'none'
+  // Mostrar form / esconder sucesso
+  document.getElementById('bookingFormInner').style.display = ''
+  document.getElementById('fSubmitBtn').style.display = ''
+  document.getElementById('formSuccess').classList.remove('show')
+  // Scroll para o topo do form
+  scrollToForm()
+}
 
 /* ── MISC ── */
 window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50))
