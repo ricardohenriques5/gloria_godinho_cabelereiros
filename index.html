@@ -59,6 +59,11 @@
       text-decoration:none; border-radius:2px; transition:background .3s;
     }
     .nav-marcar:hover { background:var(--gold-h); }
+    @media(max-width:480px) {
+      .nav-marcar { font-size:.5rem; letter-spacing:.08em; padding:.45rem .7rem; }
+      .nav-logo-name { font-size:.9rem; }
+      .nav-logo-sub { font-size:.45rem; }
+    }
 
     /* Mobile menu */
     .mobile-menu {
@@ -298,9 +303,9 @@
     .footer-copy { font-size:.55rem; color:var(--text-s); letter-spacing:.08em; }
 
     /* ── ADMIN OVERLAY ── */
-    #adminOverlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(30,14,5,0.88); backdrop-filter:blur(3px); overflow-y:auto; }
+    #adminOverlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(30,14,5,0.88); backdrop-filter:blur(3px); overflow-y:auto; overflow-x:hidden; }
     #adminOverlay.open { display:block; }
-    .admin-wrap { max-width:1100px; margin:0 auto; padding:3rem 1.5rem; color:#e8d0b0; }
+    .admin-wrap { max-width:1100px; margin:0 auto; padding:3rem 1.5rem; color:#e8d0b0; width:100%; box-sizing:border-box; overflow-x:hidden; }
     #adminLogin { max-width:380px; margin:6rem auto; }
     .admin-login-logo { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--nude); text-align:center; margin-bottom:.25rem; }
     .admin-login-sub { font-size:.5rem; letter-spacing:.25em; text-transform:uppercase; color:var(--sand); text-align:center; margin-bottom:2.5rem; }
@@ -343,7 +348,8 @@
     .admin-filter { display:flex; gap:.5rem; margin-bottom:1.25rem; flex-wrap:wrap; }
     .filter-btn { font-size:.45rem; letter-spacing:.15em; text-transform:uppercase; color:var(--sand); border:1px solid rgba(196,149,106,.3); background:none; padding:.35rem .75rem; cursor:pointer; font-family:'Jost',sans-serif; transition:all .3s; }
     .filter-btn:hover, .filter-btn.active { color:var(--gold); border-color:var(--gold); }
-    .bookings-table { width:100%; border-collapse:collapse; }
+    .bookings-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .bookings-table { width:100%; border-collapse:collapse; min-width:600px; }
     .bookings-table th { text-align:left; font-size:.45rem; letter-spacing:.18em; text-transform:uppercase; color:var(--sand); padding:.65rem .9rem; border-bottom:1px solid rgba(196,149,106,.2); font-weight:400; }
     .bookings-table td { padding:.8rem .9rem; border-bottom:1px solid rgba(196,149,106,.12); font-size:.78rem; color:#d4a87a; vertical-align:middle; }
     .bookings-table tr:hover td { color:var(--cream); }
@@ -519,10 +525,10 @@
         <button class="filter-btn" onclick="filterBookings('confirmada',this)">Confirmadas</button>
         <button class="filter-btn" onclick="filterBookings('cancelada',this)">Canceladas</button>
       </div>
-      <table class="bookings-table">
+      <div class="bookings-table-wrap"><table class="bookings-table">
         <thead><tr><th>Cliente</th><th>Serviço</th><th>Data</th><th>Hora</th><th>Cabeleireira</th><th>Estado</th><th>Ações</th></tr></thead>
         <tbody id="bookingsBody"></tbody>
-      </table>
+      </table></div>
       <div class="no-bookings" id="noBookings" style="display:none">Sem marcações para mostrar.</div>
     </div>
   </div>
