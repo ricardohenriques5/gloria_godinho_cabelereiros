@@ -345,6 +345,20 @@
     .cal-booking-label.pendente { background:rgba(196,149,106,.25); color:var(--nude); border-left:2px solid var(--gold); }
     .cal-booking-label.confirmada { background:rgba(100,180,100,.2); color:#8dc88d; border-left:2px solid #8dc88d; }
     .cal-booking-label.cancelada { background:rgba(200,100,100,.15); color:#e09090; border-left:2px solid #e09090; text-decoration:line-through; }
+
+    /* ADMIN TABS */
+    .admin-tabs { display:flex; gap:0; margin-bottom:2rem; border-bottom:1px solid rgba(196,149,106,.2); }
+    .admin-tab {
+      font-size:.5rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--sand); background:none; border:none; border-bottom:2px solid transparent;
+      padding:.75rem 1.25rem; cursor:pointer; font-family:'Jost',sans-serif;
+      transition:all .25s; margin-bottom:-1px;
+    }
+    .admin-tab:hover { color:var(--gold); }
+    .admin-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+    .admin-tab-panel { display:none; }
+    .admin-tab-panel.active { display:block; }
+
     .admin-filter { display:flex; gap:.5rem; margin-bottom:.5rem; flex-wrap:wrap; }
     .admin-filter-row { display:flex; gap:.75rem; margin-bottom:1.25rem; flex-wrap:wrap; align-items:center; }
     .admin-filter-label { font-size:.4rem; letter-spacing:.15em; text-transform:uppercase; color:rgba(196,149,106,.5); margin-right:.25rem; }
@@ -546,13 +560,14 @@
         <div class="admin-stat"><div class="admin-stat-num" id="statConfirmadas">—</div><div class="admin-stat-label">Confirmadas</div></div>
         <div class="admin-stat"><div class="admin-stat-num" id="statHoje">—</div><div class="admin-stat-label">Hoje</div></div>
       </div>
-      <div class="admin-section-title">Calendário</div>
-      <div class="cal-nav"><button onclick="calPrev()">‹</button><div class="cal-month" id="calMonth"></div><button onclick="calNext()">›</button></div>
-      <div class="cal-grid" id="calGrid"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
-        <div class="admin-section-title" style="margin-bottom:0">Marcações</div>
-        <button class="admin-new-btn" onclick="openNewBooking()">+ Nova Marcação</button>
+      <!-- TABS -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('lista',this)">Lista de Marcações</button>
+        <button class="admin-tab" onclick="switchAdminTab('calendario',this)">Calendário</button>
+        <button class="admin-tab" onclick="openNewBooking()">+ Nova Marcação</button>
       </div>
+
+      <!-- FILTROS GLOBAIS (afectam ambas as tabs) -->
       <div class="admin-filter">
         <span class="admin-filter-label">Estado:</span>
         <button class="filter-btn active" onclick="filterBookings('todas',this)">Todas</button>
@@ -560,7 +575,7 @@
         <button class="filter-btn" onclick="filterBookings('confirmada',this)">Confirmadas</button>
         <button class="filter-btn" onclick="filterBookings('cancelada',this)">Canceladas</button>
       </div>
-      <div class="admin-filter-row">
+      <div class="admin-filter-row" style="margin-bottom:1.5rem">
         <span class="admin-filter-label">Cabeleireira:</span>
         <div class="team-dropdown-wrap" id="teamDropdownWrap">
           <button class="team-dropdown-btn" id="teamDropdownBtn" onclick="toggleTeamDropdown()">
@@ -575,11 +590,21 @@
           </div>
         </div>
       </div>
-      <div class="bookings-table-wrap"><table class="bookings-table">
-        <thead><tr><th>Cliente</th><th>Serviço</th><th>Data</th><th>Hora</th><th>Cabeleireira</th><th>Estado</th><th>Ações</th></tr></thead>
-        <tbody id="bookingsBody"></tbody>
-      </table></div>
-      <div class="no-bookings" id="noBookings" style="display:none">Sem marcações para mostrar.</div>
+
+      <!-- TAB: LISTA -->
+      <div class="admin-tab-panel active" id="tabLista">
+        <div class="bookings-table-wrap"><table class="bookings-table">
+          <thead><tr><th>Cliente</th><th>Serviço</th><th>Data</th><th>Hora</th><th>Cabeleireira</th><th>Estado</th><th>Ações</th></tr></thead>
+          <tbody id="bookingsBody"></tbody>
+        </table></div>
+        <div class="no-bookings" id="noBookings" style="display:none">Sem marcações para mostrar.</div>
+      </div>
+
+      <!-- TAB: CALENDÁRIO -->
+      <div class="admin-tab-panel" id="tabCalendario">
+        <div class="cal-nav"><button onclick="calPrev()">‹</button><div class="cal-month" id="calMonth"></div><button onclick="calNext()">›</button></div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -995,7 +1020,10 @@ function renderCal(){
     const ds=`${calYear}-${String(calMonth_+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
     const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth_&&today.getDate()===d
     const isSel=calSelectedDate===ds
-    const dayBookings=allBookings.filter(b=>b.data===ds)
+    let filteredAll=allBookings
+    if(activeEstado!=='todas') filteredAll=filteredAll.filter(b=>b.estado===activeEstado)
+    if(activeTeamId) filteredAll=filteredAll.filter(b=>String(b.cabeleireiro_id)===String(activeTeamId))
+    const dayBookings=filteredAll.filter(b=>b.data===ds)
     const labels=dayBookings.map(b=>`<div class="cal-booking-label ${b.estado}" title="${b.cliente_nome}">${(b.hora||'').slice(0,5)} ${b.cliente_nome}</div>`).join('')
     html+=`<div class="cal-day${isToday?' today':''}${isSel?' selected':''}" onclick="calSelectDay('${ds}')"><div class="cal-day-num">${d}</div>${labels}</div>`
   }
@@ -1021,6 +1049,17 @@ function filterBookings(estado,btn,dateFilter){
   if(activeTeamId) list=list.filter(b=>String(b.cabeleireiro_id)===String(activeTeamId))
   if(dateFilter) list=list.filter(b=>b.data===dateFilter)
   renderBookings(list)
+  renderCal()
+}
+
+
+function switchAdminTab(tab, btn) {
+  // Tabs
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'))
+  btn.classList.add('active')
+  // Panels
+  document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'))
+  document.getElementById(tab === 'lista' ? 'tabLista' : 'tabCalendario').classList.add('active')
 }
 
 function toggleTeamDropdown() {
