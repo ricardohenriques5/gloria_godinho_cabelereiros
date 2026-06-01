@@ -345,7 +345,41 @@
     .cal-booking-label.pendente { background:rgba(196,149,106,.25); color:var(--nude); border-left:2px solid var(--gold); }
     .cal-booking-label.confirmada { background:rgba(100,180,100,.2); color:#8dc88d; border-left:2px solid #8dc88d; }
     .cal-booking-label.cancelada { background:rgba(200,100,100,.15); color:#e09090; border-left:2px solid #e09090; text-decoration:line-through; }
-    .admin-filter { display:flex; gap:.5rem; margin-bottom:1.25rem; flex-wrap:wrap; }
+    .admin-filter { display:flex; gap:.5rem; margin-bottom:.5rem; flex-wrap:wrap; }
+    .admin-filter-row { display:flex; gap:.75rem; margin-bottom:1.25rem; flex-wrap:wrap; align-items:center; }
+    .admin-filter-label { font-size:.4rem; letter-spacing:.15em; text-transform:uppercase; color:rgba(196,149,106,.5); margin-right:.25rem; }
+    .team-dropdown-wrap { position:relative; }
+    .team-dropdown-btn {
+      display:flex; align-items:center; gap:.5rem;
+      font-size:.5rem; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--gold); border:1px solid var(--gold); background:none;
+      padding:.4rem 1rem; cursor:pointer; font-family:'Jost',sans-serif;
+      transition:all .3s; min-width:160px; justify-content:space-between;
+    }
+    .team-dropdown-btn:hover { background:rgba(196,149,106,.08); }
+    .team-dropdown-btn .arrow { font-size:.6rem; transition:transform .2s; }
+    .team-dropdown-btn.open .arrow { transform:rotate(180deg); }
+    .team-dropdown-panel {
+      display:none; position:absolute; top:calc(100% + 4px); left:0;
+      background:#1e0f07; border:1px solid rgba(196,149,106,.3);
+      min-width:200px; z-index:50; padding:.5rem 0;
+      box-shadow:0 8px 24px rgba(0,0,0,.4);
+    }
+    .team-dropdown-panel.open { display:block; }
+    .team-dropdown-search {
+      width:100%; background:rgba(255,255,255,.05); border:none;
+      border-bottom:1px solid rgba(196,149,106,.2); padding:.5rem .75rem;
+      color:#d4a878; font-family:'Jost',sans-serif; font-size:.75rem;
+      outline:none;
+    }
+    .team-dropdown-search::placeholder { color:rgba(196,149,106,.4); }
+    .team-dropdown-option {
+      display:block; width:100%; text-align:left; padding:.5rem .75rem;
+      background:none; border:none; color:#c8a882; font-family:'Jost',sans-serif;
+      font-size:.75rem; cursor:pointer; transition:background .15s;
+    }
+    .team-dropdown-option:hover { background:rgba(196,149,106,.1); color:#e8c89a; }
+    .team-dropdown-option.active { color:var(--gold); background:rgba(196,149,106,.12); font-weight:500; }
     .filter-btn { font-size:.45rem; letter-spacing:.15em; text-transform:uppercase; color:var(--sand); border:1px solid rgba(196,149,106,.3); background:none; padding:.35rem .75rem; cursor:pointer; font-family:'Jost',sans-serif; transition:all .3s; }
     .filter-btn:hover, .filter-btn.active { color:var(--gold); border-color:var(--gold); }
     .bookings-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
@@ -520,10 +554,26 @@
         <button class="admin-new-btn" onclick="openNewBooking()">+ Nova Marcação</button>
       </div>
       <div class="admin-filter">
+        <span class="admin-filter-label">Estado:</span>
         <button class="filter-btn active" onclick="filterBookings('todas',this)">Todas</button>
         <button class="filter-btn" onclick="filterBookings('pendente',this)">Pendentes</button>
         <button class="filter-btn" onclick="filterBookings('confirmada',this)">Confirmadas</button>
         <button class="filter-btn" onclick="filterBookings('cancelada',this)">Canceladas</button>
+      </div>
+      <div class="admin-filter-row">
+        <span class="admin-filter-label">Cabeleireira:</span>
+        <div class="team-dropdown-wrap" id="teamDropdownWrap">
+          <button class="team-dropdown-btn" id="teamDropdownBtn" onclick="toggleTeamDropdown()">
+            <span id="teamDropdownLabel">Todas as cabeleireiras</span>
+            <span class="arrow">▾</span>
+          </button>
+          <div class="team-dropdown-panel" id="teamDropdownPanel">
+            <input class="team-dropdown-search" type="text" placeholder="Pesquisar..." id="teamDropdownSearch" oninput="filterTeamOptions(this.value)">
+            <div id="teamDropdownOptions">
+              <button class="team-dropdown-option active" onclick="selectTeamOption(null,'Todas as cabeleireiras')">Todas as cabeleireiras</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="bookings-table-wrap"><table class="bookings-table">
         <thead><tr><th>Cliente</th><th>Serviço</th><th>Data</th><th>Hora</th><th>Cabeleireira</th><th>Estado</th><th>Ações</th></tr></thead>
@@ -755,6 +805,7 @@ async function loadTeam() {
   ]
   renderTeamSelect()
   renderTeamSection()
+  renderTeamFilters()
   // Popular select do form
   const sel = document.getElementById('fStylist')
   teamData.filter(t=>t.id).forEach(t => {
@@ -955,13 +1006,81 @@ function calSelectDay(ds){calSelectedDate=ds;renderCal();renderBookings(allBooki
 function calPrev(){calMonth_--;if(calMonth_<0){calMonth_=11;calYear--}renderCal()}
 function calNext(){calMonth_++;if(calMonth_>11){calMonth_=0;calYear++}renderCal()}
 
+let activeEstado = 'todas'
+let activeTeamId = null
+
 function filterBookings(estado,btn,dateFilter){
-  if(btn){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');calSelectedDate=null;renderCal()}
+  if(btn){
+    document.querySelectorAll('.filter-btn:not(.filter-team)').forEach(b=>b.classList.remove('active'))
+    btn.classList.add('active')
+    activeEstado = estado
+    calSelectedDate=null; renderCal()
+  }
   let list=allBookings
-  if(estado!=='todas')list=list.filter(b=>b.estado===estado)
-  if(dateFilter)list=list.filter(b=>b.data===dateFilter)
+  if(activeEstado!=='todas') list=list.filter(b=>b.estado===activeEstado)
+  if(activeTeamId) list=list.filter(b=>String(b.cabeleireiro_id)===String(activeTeamId))
+  if(dateFilter) list=list.filter(b=>b.data===dateFilter)
   renderBookings(list)
 }
+
+function toggleTeamDropdown() {
+  const btn = document.getElementById('teamDropdownBtn')
+  const panel = document.getElementById('teamDropdownPanel')
+  const isOpen = panel.classList.contains('open')
+  if (isOpen) {
+    panel.classList.remove('open')
+    btn.classList.remove('open')
+  } else {
+    panel.classList.add('open')
+    btn.classList.add('open')
+    document.getElementById('teamDropdownSearch').value = ''
+    filterTeamOptions('')
+    document.getElementById('teamDropdownSearch').focus()
+  }
+}
+
+function filterTeamOptions(query) {
+  const opts = document.querySelectorAll('#teamDropdownOptions .team-dropdown-option')
+  opts.forEach(opt => {
+    const match = opt.textContent.toLowerCase().includes(query.toLowerCase())
+    opt.style.display = match ? 'block' : 'none'
+  })
+}
+
+function selectTeamOption(id, nome) {
+  activeTeamId = id
+  document.getElementById('teamDropdownLabel').textContent = nome
+  document.getElementById('teamDropdownPanel').classList.remove('open')
+  document.getElementById('teamDropdownBtn').classList.remove('open')
+  // Update active state
+  document.querySelectorAll('#teamDropdownOptions .team-dropdown-option').forEach(o => {
+    o.classList.toggle('active', (o.textContent === nome))
+  })
+  filterBookings(activeEstado, null)
+}
+
+function renderTeamFilters() {
+  const opts = document.getElementById('teamDropdownOptions')
+  if (!opts) return
+  // Limpar opções excepto "Todas"
+  Array.from(opts.querySelectorAll('.team-dropdown-option:not(:first-child)')).forEach(o => o.remove())
+  teamData.filter(t => t.id).forEach(t => {
+    const btn = document.createElement('button')
+    btn.className = 'team-dropdown-option'
+    btn.textContent = t.nome
+    btn.onclick = () => selectTeamOption(t.id, t.nome)
+    opts.appendChild(btn)
+  })
+}
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('teamDropdownWrap')
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('teamDropdownPanel')?.classList.remove('open')
+    document.getElementById('teamDropdownBtn')?.classList.remove('open')
+  }
+})
 
 function renderBookings(list){
   const tbody=document.getElementById('bookingsBody')
