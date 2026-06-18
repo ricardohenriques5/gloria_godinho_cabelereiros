@@ -201,6 +201,66 @@
     }
     .service-btn.selected .service-btn-check { display:flex; }
 
+    /* ── NOVO FLUXO: categorias → subcategorias → serviços ── */
+    .booking-view { display:none; }
+    .booking-view.active { display:block; animation:fadeViewIn .4s ease; }
+    @keyframes fadeViewIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Breadcrumb */
+    .booking-breadcrumb { display:flex; align-items:center; gap:.5rem; margin-bottom:1.75rem; flex-wrap:wrap; font-size:.7rem; }
+    .breadcrumb-item { color:var(--gold); cursor:pointer; transition:color .2s; background:none; border:none; font-family:'Jost',sans-serif; font-size:.7rem; padding:0; letter-spacing:.03em; }
+    .breadcrumb-item:hover { color:var(--terracotta); text-decoration:underline; }
+    .breadcrumb-item.current { color:var(--text-s); cursor:default; pointer-events:none; }
+    .breadcrumb-sep { color:var(--sand); font-size:.7rem; }
+    .btn-back { display:inline-flex; align-items:center; gap:.4rem; background:none; border:none; color:var(--gold); font-family:'Jost',sans-serif; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; padding:.4rem 0; margin-bottom:1rem; transition:color .2s; }
+    .btn-back:hover { color:var(--terracotta); }
+
+    /* Grid de categorias-mãe */
+    .cat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .cat-card {
+      position:relative; aspect-ratio:16/10; border-radius:6px; overflow:hidden;
+      cursor:pointer; border:none; padding:0; text-align:left;
+      transition:transform .3s, box-shadow .3s;
+    }
+    .cat-card:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(61,43,31,.18); }
+    .cat-card-bg { position:absolute; inset:0; background-size:cover; background-position:center; transition:transform .4s; }
+    .cat-card:hover .cat-card-bg { transform:scale(1.06); }
+    .cat-card-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(61,43,31,.8) 0%, rgba(61,43,31,.25) 60%, rgba(61,43,31,.1) 100%); }
+    .cat-card-content { position:absolute; bottom:0; left:0; right:0; padding:1.25rem; z-index:2; }
+    .cat-card-name { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--white); margin-bottom:.15rem; }
+    .cat-card-count { font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--nude); }
+
+    /* Subcategorias */
+    .subcat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .subcat-card {
+      background:var(--white); border:1.5px solid var(--border); border-radius:6px;
+      padding:1.5rem 1.25rem; cursor:pointer; text-align:center;
+      transition:all .25s; font-family:'Jost',sans-serif;
+    }
+    .subcat-card:hover { border-color:var(--gold); transform:translateY(-2px); box-shadow:0 8px 20px rgba(61,43,31,.1); }
+    .subcat-card-name { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--dark); margin-bottom:.3rem; }
+    .subcat-card-count { font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); }
+
+    /* Lista de serviços */
+    .servicos-section-label { font-size:.5rem; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin:1.5rem 0 .85rem; display:flex; align-items:center; gap:.6rem; }
+    .servicos-section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .servico-row {
+      display:flex; align-items:center; justify-content:space-between; gap:1rem;
+      background:var(--white); border:1.5px solid var(--border); border-radius:6px;
+      padding:1rem 1.25rem; margin-bottom:8px; cursor:pointer; transition:all .25s;
+    }
+    .servico-row:hover { border-color:var(--gold); transform:translateX(3px); }
+    .servico-row.whatsapp { cursor:pointer; }
+    .servico-row.whatsapp:hover { border-color:#25D366; }
+    .servico-info { flex:1; }
+    .servico-nome { font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--dark); margin-bottom:.1rem; }
+    .servico-preco { font-size:.8rem; color:var(--gold); font-style:italic; }
+    .servico-preco.sob-consulta { color:var(--text-s); }
+    .servico-action { display:flex; align-items:center; gap:.5rem; font-size:.6rem; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+    .servico-action.online { color:var(--gold); }
+    .servico-action.whatsapp { color:#25D366; }
+    .servico-action-icon { font-size:1rem; }
+
     /* Divider between services + team */
     .booking-cols { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2.5rem; }
 
@@ -303,7 +363,7 @@
     .footer-copy { font-size:.55rem; color:var(--text-s); letter-spacing:.08em; }
 
     /* ── ADMIN OVERLAY ── */
-    #adminOverlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(64,61,57,0.96); backdrop-filter:blur(8px); overflow-y:auto; overflow-x:hidden; }
+    #adminOverlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(91,75,73,0.75); backdrop-filter:blur(8px); overflow-y:auto; overflow-x:hidden; }
     #adminOverlay.open { display:block; }
     .admin-wrap { max-width:1100px; margin:0 auto; padding:3rem 1.5rem; color:#e8d0b0; width:100%; box-sizing:border-box; overflow-x:hidden; }
     #adminLogin { max-width:380px; margin:6rem auto; }
@@ -693,50 +753,68 @@
   <div class="booking-intro fade-up">
     <div class="section-label">Marcações</div>
     <h2 class="section-title">Fazer <em>Marcação</em></h2>
-    <p>Escolhe o serviço e a cabeleireira e preenche os teus dados.</p>
+    <p id="bookingIntroText">Escolhe uma categoria para começar.</p>
   </div>
 
-  <!-- Serviços + Cabeleireiras lado a lado -->
-  <div class="booking-cols fade-up">
-    <!-- Serviços -->
-    <div>
-      <div class="booking-step-title"><span>1</span>Escolhe o serviço</div>
-      <div class="services-select-grid" id="servicesSelectGrid"></div>
-    </div>
-    <!-- Cabeleireiras -->
-    <div>
-      <div class="booking-step-title"><span>2</span>Escolhe a cabeleireira</div>
-      <div class="team-select-list" id="teamSelectList"><div style="color:var(--text-s);font-size:.8rem;font-style:italic">A carregar...</div></div>
-    </div>
+  <!-- Breadcrumb -->
+  <div class="booking-breadcrumb fade-up" id="bookingBreadcrumb" style="display:none"></div>
+
+  <!-- VISTA 1: Categorias-mãe -->
+  <div class="booking-view active" id="viewCategorias">
+    <div class="cat-grid" id="catGrid"></div>
   </div>
 
-  <!-- Formulário -->
-  <div class="booking-form-wrap fade-up" id="bookingFormWrap">
-    <div class="booking-step-title"><span>3</span>Os teus dados</div>
-    <div id="bookingFormInner">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Nome</label><input class="form-input" type="text" id="fName" placeholder="O seu nome"></div>
-        <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="tel" id="fPhone" placeholder="9XX XXX XXX"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="fEmail" placeholder="email@exemplo.pt"></div>
-        <div class="form-group" id="fServiceGroup"><label class="form-label">Serviço <span class="preselected-tag" id="fServiceTag" style="display:none">✓ seleccionado</span></label><select class="form-select" id="fService"><option value="">Seleccionar...</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group" id="fStylistGroup"><label class="form-label">Cabeleireira <span class="preselected-tag" id="fStylistTag" style="display:none">✓ seleccionada</span></label><select class="form-select" id="fStylist"><option value="">Indiferente</option></select></div>
-        <div class="form-group"><label class="form-label">Data preferida</label><input class="form-input" type="text" id="fDate" placeholder="Seleccionar data..." readonly style="cursor:pointer"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Hora preferida</label><select class="form-select" id="fTime"><option value="">Seleccionar...</option><option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option></select></div>
-        <div class="form-group single"><label class="form-label">Notas</label><input class="form-input" type="text" id="fNotes" placeholder="Informação adicional..."></div>
-      </div>
-      <button class="btn-submit" id="fSubmitBtn" onclick="submitBooking()">Reservar</button>
-      <div class="form-error" id="fError"></div>
+  <!-- VISTA 2: Subcategorias -->
+  <div class="booking-view" id="viewSubcategorias">
+    <button class="btn-back" onclick="goToCategorias()">‹ Voltar às categorias</button>
+    <div class="subcat-grid" id="subcatGrid"></div>
+  </div>
+
+  <!-- VISTA 3: Serviços -->
+  <div class="booking-view" id="viewServicos">
+    <button class="btn-back" id="backToSubcatBtn" onclick="goToSubcategorias()">‹ Voltar</button>
+    <div id="servicosList"></div>
+  </div>
+
+  <!-- VISTA 4: Especialista + Formulário (só online) -->
+  <div class="booking-view" id="viewFormulario">
+    <button class="btn-back" onclick="goToServicos()">‹ Voltar aos serviços</button>
+    <div style="background:var(--warm);border-radius:6px;padding:1rem 1.25rem;margin-bottom:1.5rem">
+      <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem">Serviço seleccionado</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--dark)" id="selectedServiceName">—</div>
+      <div style="font-size:.8rem;color:var(--gold);font-style:italic" id="selectedServicePrice">—</div>
     </div>
-    <div class="form-success" id="formSuccess">
-      <div class="form-success-icon">✦</div>
-      <p id="successDetail">Pedido enviado com sucesso!</p>
-      <button class="btn-nova-marcacao" onclick="resetBookingForm()">+ Nova Marcação</button>
+
+    <!-- Escolher cabeleireira -->
+    <div class="booking-step-title"><span>1</span>Escolhe a cabeleireira</div>
+    <div class="team-select-list" id="teamSelectList" style="margin-bottom:2rem"><div style="color:var(--text-s);font-size:.8rem;font-style:italic">A carregar...</div></div>
+
+    <!-- Formulário -->
+    <div class="booking-form-wrap" id="bookingFormWrap">
+      <div class="booking-step-title"><span>2</span>Os teus dados</div>
+      <div id="bookingFormInner">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Nome</label><input class="form-input" type="text" id="fName" placeholder="O seu nome"></div>
+          <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="tel" id="fPhone" placeholder="9XX XXX XXX"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group single"><label class="form-label">Email</label><input class="form-input" type="email" id="fEmail" placeholder="email@exemplo.pt"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Data preferida</label><input class="form-input" type="text" id="fDate" placeholder="Seleccionar data..." readonly style="cursor:pointer"></div>
+          <div class="form-group"><label class="form-label">Hora preferida</label><select class="form-select" id="fTime"><option value="">Seleccionar...</option><option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option></select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group single"><label class="form-label">Notas</label><input class="form-input" type="text" id="fNotes" placeholder="Informação adicional..."></div>
+        </div>
+        <button class="btn-submit" id="fSubmitBtn" onclick="submitBooking()">Confirmar Marcação</button>
+        <div class="form-error" id="fError"></div>
+      </div>
+      <div class="form-success" id="formSuccess">
+        <div class="form-success-icon">✦</div>
+        <p id="successDetail">Marcação efectuada com sucesso!</p>
+        <button class="btn-nova-marcacao" onclick="resetBookingFlow()">+ Nova Marcação</button>
+      </div>
     </div>
   </div>
 </section>
@@ -778,74 +856,160 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const EDGE_FN      = `${SUPABASE_URL}/functions/v1/smart-action`
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
-/* ── SERVIÇOS ── */
-const SERVICOS = [
-  { nome:'Corte & Styling',  desc:'Corte personalizado, lavagem e finalização profissional com produtos Paul Rivera.', preco:'Desde €25', img:'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=400&h=200&fit=crop&crop=center' },
-  { nome:'Coloração',        desc:'Global, reflexos, balayage ou ombre. Técnicas avançadas, resultados naturais.',     preco:'Desde €45', img:'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=200&fit=crop&crop=center' },
-  { nome:'Tratamentos',      desc:'Hidratação, nutrição e reparação intensiva.',                                       preco:'Desde €35', img:'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&h=200&fit=crop&crop=center' },
-  { nome:'Penteados',        desc:'Para noivas, eventos ou dia-a-dia.',                                                preco:'Desde €40', img:'https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=400&h=200&fit=crop&crop=center' },
-  { nome:'Alisamento',       desc:'Progressivo, keratina e suavização. Resultados de longa duração.',                 preco:'Desde €80', img:'https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&h=200&fit=crop&crop=center' },
-  { nome:'Beauty & Beleza',  desc:'Serviços complementares de beleza para uma transformação completa.',                preco:'Sob consulta', img:'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=200&fit=crop&crop=center' },
-]
+/* ════════════════════════════════════════════════
+   NOVO FLUXO DE MARCAÇÃO (categorias → serviços → form)
+   ════════════════════════════════════════════════ */
+const WHATSAPP_NUMERO = '351938937433'  // número da Glória
 
-/* ── RENDER SERVIÇOS no painel de marcação ── */
-function renderServicesSelect() {
-  const grid = document.getElementById('servicesSelectGrid')
-  // Popular select do form
-  const sel = document.getElementById('fService')
-  SERVICOS.forEach(s => {
-    const o = document.createElement('option'); o.value = o.textContent = s.nome; sel.appendChild(o)
-  })
-  grid.innerHTML = SERVICOS.map(s => `
-    <button class="service-btn" onclick="selectService('${s.nome}',this)" type="button">
-      <div class="service-btn-img"><img src="${s.img}" alt="${s.nome}" onerror="this.style.display='none'"></div>
-      <div class="service-btn-body">
-        <div class="service-btn-name">${s.nome}</div>
-        <div class="service-btn-price">${s.preco}</div>
-      </div>
-      <div class="service-btn-check">✓</div>
-    </button>`).join('')
-}
-
-function selectService(nome, btn) {
-  document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('selected'))
-  btn.classList.add('selected')
-  document.getElementById('fService').value = nome
-  document.getElementById('fServiceTag').style.display = 'inline'
-  document.getElementById('fServiceGroup').classList.add('preselected')
-  // Scroll para form só se cabeleireira já estiver seleccionada
-  if (selectedStylistId !== null) scrollToForm()
-}
-
-/* ── EQUIPA dinâmica ── */
+let CATEGORIAS = []      // todas as categorias (mãe + filhas)
+let SERVICOS_DB = []     // todos os serviços
 let teamData = []
+let servicoCabeleireiro = []  // associações serviço↔cabeleireira
+
+let currentMae = null
+let currentSubcat = null
+let selectedServico = null
 let selectedStylistId = null
 
-async function loadTeam() {
-  const { data, error } = await sb.from('cabeleireiros').select('*').eq('ativo', true).order('nome')
-  teamData = (!error && data && data.length) ? data : [
-    { id:null, nome:'Especialista', especialidade:'Cabeleireira Sénior',  foto_url:null },
-    { id:null, nome:'Especialista', especialidade:'Colorista & Balayage', foto_url:null },
-    { id:null, nome:'Especialista', especialidade:'Tratamentos & Beleza', foto_url:null },
-  ]
-  renderTeamSelect()
+/* Imagens para categorias-mãe */
+const CAT_IMGS = {
+  'Cabelo':              'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&h=400&fit=crop&crop=center',
+  'Estética':            'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=600&h=400&fit=crop&crop=center',
+  'Laser':               'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&h=400&fit=crop&crop=center',
+  'Massagens & Terapias':'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=600&h=400&fit=crop&crop=center',
+}
+
+/* ── CARREGAR DADOS ── */
+async function loadBookingData() {
+  const [cats, servs, team, sc] = await Promise.all([
+    sb.from('categorias').select('*').eq('ativo',true).order('ordem'),
+    sb.from('servicos').select('*').eq('ativo',true).order('ordem'),
+    sb.from('cabeleireiros').select('*').eq('ativo',true).order('nome'),
+    sb.from('servico_cabeleireiro').select('*'),
+  ])
+  CATEGORIAS = cats.data || []
+  SERVICOS_DB = servs.data || []
+  teamData = team.data || []
+  servicoCabeleireiro = sc.data || []
+  renderCategorias()
   renderTeamSection()
-  renderTeamFilters()
-  // Popular select do form
-  const sel = document.getElementById('fStylist')
-  teamData.filter(t=>t.id).forEach(t => {
-    const o = document.createElement('option'); o.value = t.id; o.textContent = t.nome; sel.appendChild(o)
-  })
-  // Popular admin selects
+  if (typeof renderTeamFilters === 'function') renderTeamFilters()
+  // Popular selects do admin
   const aSel = document.getElementById('anEspecialista')
-  teamData.filter(t=>t.id).forEach(t => {
-    const o = document.createElement('option'); o.value = t.id; o.textContent = t.nome; aSel.appendChild(o)
-  })
+  if (aSel) teamData.forEach(t => { const o=document.createElement('option'); o.value=t.id; o.textContent=t.nome; aSel.appendChild(o) })
+}
+
+/* ── VISTA 1: CATEGORIAS-MÃE ── */
+function renderCategorias() {
+  const grid = document.getElementById('catGrid')
+  const maes = CATEGORIAS.filter(c => c.parent_id === null)
+  grid.innerHTML = maes.map(mae => {
+    const numSubs = CATEGORIAS.filter(c => c.parent_id === mae.id).length
+    const img = CAT_IMGS[mae.nome] || ''
+    return `<button class="cat-card" onclick="goToSubcategorias(${mae.id})" type="button">
+      <div class="cat-card-bg" style="background-image:url('${img}')"></div>
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-card-name">${mae.nome}</div>
+        <div class="cat-card-count">${numSubs} categoria${numSubs!==1?'s':''}</div>
+      </div>
+    </button>`
+  }).join('')
+}
+
+/* ── VISTA 2: SUBCATEGORIAS ── */
+function goToSubcategorias(maeId) {
+  if (maeId !== undefined) currentMae = CATEGORIAS.find(c => c.id === maeId)
+  const subs = CATEGORIAS.filter(c => c.parent_id === currentMae.id)
+  const grid = document.getElementById('subcatGrid')
+  grid.innerHTML = subs.map(sub => {
+    const numServ = SERVICOS_DB.filter(s => s.categoria_id === sub.id).length
+    return `<button class="subcat-card" onclick="goToServicos(${sub.id})" type="button">
+      <div class="subcat-card-name">${sub.nome}</div>
+      <div class="subcat-card-count">${numServ} serviço${numServ!==1?'s':''}</div>
+    </button>`
+  }).join('')
+  updateBreadcrumb()
+  switchView('viewSubcategorias')
+}
+
+/* ── VISTA 3: SERVIÇOS ── */
+function goToServicos(subId) {
+  if (subId !== undefined) currentSubcat = CATEGORIAS.find(c => c.id === subId)
+  const servs = SERVICOS_DB.filter(s => s.categoria_id === currentSubcat.id)
+  const online = servs.filter(s => s.tipo === 'online')
+  const whatsapp = servs.filter(s => s.tipo === 'whatsapp')
+  const list = document.getElementById('servicosList')
+
+  let html = ''
+  if (online.length) {
+    html += `<div class="servicos-section-label">Marcação Online</div>`
+    html += online.map(s => `
+      <div class="servico-row" onclick="selectServico(${s.id})">
+        <div class="servico-info">
+          <div class="servico-nome">${s.nome}</div>
+          <div class="servico-preco">${s.preco||''}</div>
+        </div>
+        <div class="servico-action online"><span class="servico-action-icon">✦</span> Marcar</div>
+      </div>`).join('')
+  }
+  if (whatsapp.length) {
+    html += `<div class="servicos-section-label">Marcação por WhatsApp</div>`
+    html += whatsapp.map(s => `
+      <div class="servico-row whatsapp" onclick="marcarWhatsapp('${s.nome.replace(/'/g,"\\'")}')">
+        <div class="servico-info">
+          <div class="servico-nome">${s.nome}</div>
+          <div class="servico-preco sob-consulta">${s.preco||'Sob consulta'}</div>
+        </div>
+        <div class="servico-action whatsapp"><span class="servico-action-icon">✆</span> WhatsApp</div>
+      </div>`).join('')
+  }
+  document.getElementById('servicosList').innerHTML = html
+  updateBreadcrumb()
+  switchView('viewServicos')
+}
+
+/* ── WhatsApp redirect ── */
+function marcarWhatsapp(servicoNome) {
+  const texto = encodeURIComponent(`Olá! Gostaria de marcar: ${servicoNome} (${currentSubcat.nome})`)
+  window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${texto}`, '_blank')
+}
+
+/* ── VISTA 4: seleccionar serviço online → form ── */
+function selectServico(servicoId) {
+  selectedServico = SERVICOS_DB.find(s => s.id === servicoId)
+  selectedStylistId = null
+  document.getElementById('selectedServiceName').textContent = selectedServico.nome
+  document.getElementById('selectedServicePrice').textContent = selectedServico.preco || ''
+  renderTeamSelect()
+  // reset form
+  document.getElementById('bookingFormInner').style.display = ''
+  document.getElementById('fSubmitBtn').style.display = ''
+  document.getElementById('formSuccess').classList.remove('show')
+  ;['fName','fPhone','fEmail','fNotes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''})
+  const fp = document.querySelector('#fDate')?._flatpickr; if(fp) fp.clear()
+  document.getElementById('fTime').value=''
+  updateBreadcrumb()
+  switchView('viewFormulario')
+}
+
+/* ── Cabeleireiras que fazem o serviço seleccionado ── */
+function getStylistsForService(servicoId) {
+  const ids = servicoCabeleireiro.filter(sc => sc.servico_id === servicoId).map(sc => sc.cabeleireiro_id)
+  // Se não há associações definidas, mostra todas (fallback)
+  if (!ids.length) return teamData
+  return teamData.filter(t => ids.includes(t.id))
 }
 
 function renderTeamSelect() {
   const list = document.getElementById('teamSelectList')
-  list.innerHTML = teamData.map(t => `
+  const stylists = selectedServico ? getStylistsForService(selectedServico.id) : teamData
+  let html = `<button class="team-btn" onclick="selectStylist(null,'Indiferente',this)" type="button">
+    <div class="team-btn-avatar"><div class="team-btn-avatar-icon">✦</div></div>
+    <div class="team-btn-info"><div class="team-btn-name">Indiferente</div><div class="team-btn-role">Qualquer disponível</div></div>
+    <div class="team-btn-check">✓</div>
+  </button>`
+  html += stylists.map(t => `
     <button class="team-btn" onclick="selectStylist(${JSON.stringify(t.id)},'${t.nome.replace(/'/g,"\\'")}',this)" type="button">
       <div class="team-btn-avatar">
         ${t.foto_url ? `<img src="${t.foto_url}" alt="${t.nome}">` : '<div class="team-btn-avatar-icon">✦</div>'}
@@ -856,12 +1020,7 @@ function renderTeamSelect() {
       </div>
       <div class="team-btn-check">✓</div>
     </button>`).join('')
-  // Opção "Indiferente"
-  list.innerHTML = `<button class="team-btn" onclick="selectStylist(null,'Indiferente',this)" type="button">
-    <div class="team-btn-avatar"><div class="team-btn-avatar-icon">✦</div></div>
-    <div class="team-btn-info"><div class="team-btn-name">Indiferente</div><div class="team-btn-role">Qualquer disponível</div></div>
-    <div class="team-btn-check">✓</div>
-  </button>` + list.innerHTML
+  list.innerHTML = html
 }
 
 function renderTeamSection() {
@@ -869,9 +1028,7 @@ function renderTeamSection() {
   if (!grid) return
   grid.innerHTML = teamData.map(t => `
     <div class="team-card">
-      <div class="team-photo">
-        ${t.foto_url ? `<img src="${t.foto_url}" alt="${t.nome}">` : ''}
-      </div>
+      <div class="team-photo">${t.foto_url ? `<img src="${t.foto_url}" alt="${t.nome}">` : ''}</div>
       <div class="team-name">${t.nome}</div>
       <div class="team-role-text">${t.especialidade||''}</div>
     </div>`).join('')
@@ -881,30 +1038,55 @@ function selectStylist(id, nome, btn) {
   document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'))
   btn.classList.add('selected')
   selectedStylistId = id
-  if (id) {
-    document.getElementById('fStylist').value = id
-    document.getElementById('fStylistTag').style.display = 'inline'
-    document.getElementById('fStylistGroup').classList.add('preselected')
-  }
-  // Scroll para form só se serviço já estiver seleccionado
-  const servicoSel = document.getElementById('fService').value
-  if (servicoSel) scrollToForm()
 }
 
-function scrollToForm() {
-  const el = document.getElementById('bookingFormWrap')
-  const y = el.getBoundingClientRect().top + window.scrollY - (window.innerHeight/2 - el.offsetHeight/2)
+/* ── BREADCRUMB ── */
+function updateBreadcrumb() {
+  const bc = document.getElementById('bookingBreadcrumb')
+  const parts = [`<button class="breadcrumb-item" onclick="goToCategorias()">Categorias</button>`]
+  if (currentMae) {
+    parts.push(`<span class="breadcrumb-sep">›</span>`)
+    parts.push(`<button class="breadcrumb-item" onclick="goToSubcategorias(${currentMae.id})">${currentMae.nome}</button>`)
+  }
+  if (currentSubcat && (document.getElementById('viewServicos').classList.contains('active') || document.getElementById('viewFormulario').classList.contains('active'))) {
+    parts.push(`<span class="breadcrumb-sep">›</span>`)
+    parts.push(`<button class="breadcrumb-item" onclick="goToServicos(${currentSubcat.id})">${currentSubcat.nome}</button>`)
+  }
+  if (selectedServico && document.getElementById('viewFormulario').classList.contains('active')) {
+    parts.push(`<span class="breadcrumb-sep">›</span>`)
+    parts.push(`<span class="breadcrumb-item current">${selectedServico.nome}</span>`)
+  }
+  bc.innerHTML = parts.join(' ')
+  bc.style.display = currentMae ? 'flex' : 'none'
+}
+
+/* ── NAVEGAÇÃO ENTRE VISTAS ── */
+function switchView(viewId) {
+  document.querySelectorAll('.booking-view').forEach(v => v.classList.remove('active'))
+  document.getElementById(viewId).classList.add('active')
+  updateBreadcrumb()
+  // Scroll suave para o topo da secção de marcação
+  const sec = document.getElementById('marcacoes')
+  const y = sec.getBoundingClientRect().top + window.scrollY - 80
   window.scrollTo({ top: Math.max(0,y), behavior:'smooth' })
 }
 
-/* ── CALENDÁRIO FLATPICKR ── */
+function goToCategorias() {
+  currentMae = null; currentSubcat = null; selectedServico = null
+  document.getElementById('bookingBreadcrumb').style.display = 'none'
+  switchView('viewCategorias')
+}
+
+/* ── CALENDÁRIO FLATPICKR (só a partir de amanhã) ── */
 let bookedSlots = []
 
 async function initCalendar() {
   const { data } = await sb.from('marcacoes').select('data,hora,cabeleireiro_id').in('estado',['pendente','confirmada'])
   bookedSlots = data || []
+  // minDate = amanhã (não permite marcar para o próprio dia)
+  const amanha = new Date(); amanha.setDate(amanha.getDate()+1)
   flatpickr('#fDate', {
-    locale:'pt', minDate:'today',
+    locale:'pt', minDate:amanha,
     disable: [d => d.getDay()===0],
     dateFormat:'Y-m-d', altInput:true, altFormat:'D, d M Y', disableMobile:true,
     onChange(sel, dateStr) { updateAvailableHours(dateStr) }
@@ -913,7 +1095,7 @@ async function initCalendar() {
 
 function updateAvailableHours(dateStr) {
   const sel = document.getElementById('fTime')
-  const stylist = document.getElementById('fStylist').value
+  const stylist = selectedStylistId
   const allHours = ['09:00','10:00','11:00','12:00','14:00','15:00','16:00','17:00','18:00']
   const occupied = bookedSlots.filter(b=>b.data===dateStr&&(!stylist||String(b.cabeleireiro_id)===String(stylist))).map(b=>(b.hora||'').slice(0,5))
   sel.innerHTML = '<option value="">Seleccionar...</option>'
@@ -932,32 +1114,37 @@ async function submitBooking() {
   const name=document.getElementById('fName').value.trim()
   const phone=document.getElementById('fPhone').value.trim()
   const email=document.getElementById('fEmail').value.trim()
-  const service=document.getElementById('fService').value
-  const stylist=document.getElementById('fStylist').value
   const date=document.getElementById('fDate').value
   const time=document.getElementById('fTime').value
   const notes=document.getElementById('fNotes').value.trim()
-  if (!name||!phone||!service||!date||!time) { errBox.textContent='Por favor preencha: nome, telefone, serviço, data e hora.'; errBox.style.display='block'; return }
+  const stylist=selectedStylistId
+  if (!selectedServico) { errBox.textContent='Serviço não seleccionado.'; errBox.style.display='block'; return }
+  if (!name||!phone||!date||!time) { errBox.textContent='Por favor preencha: nome, telefone, data e hora.'; errBox.style.display='block'; return }
   btn.disabled=true; btn.textContent='A enviar...'
   try {
     const q=sb.from('marcacoes').select('id').eq('data',date).eq('hora',time+':00').in('estado',['pendente','confirmada'])
     if(stylist) q.eq('cabeleireiro_id',parseInt(stylist))
     const {data:exist}=await q
-    if(exist&&exist.length){errBox.textContent='Esse horário já está reservado. Escolhe outra hora ou cabeleireira.';errBox.style.display='block';btn.disabled=false;btn.textContent='Reservar';return}
+    if(exist&&exist.length){errBox.textContent='Esse horário já está reservado. Escolhe outra hora ou cabeleireira.';errBox.style.display='block';btn.disabled=false;btn.textContent='Confirmar Marcação';return}
     let clienteId=null
     if(email){const{data:ce}=await sb.from('clientes').select('id').eq('email',email).maybeSingle();if(ce){clienteId=ce.id}else{const{data:nc}=await sb.from('clientes').insert({nome:name,email,telefone:phone}).select('id').single();if(nc)clienteId=nc.id}}
-    const m={cliente_nome:name,cliente_email:email||null,cliente_telefone:phone,servico:service,data:date,hora:time+':00',notas:notes||null,estado:'pendente'}
+    const m={cliente_nome:name,cliente_email:email||null,cliente_telefone:phone,servico:selectedServico.nome,servico_id:selectedServico.id,data:date,hora:time+':00',notas:notes||null,estado:'pendente'}
     if(stylist)m.cabeleireiro_id=parseInt(stylist)
     if(clienteId)m.cliente_id=clienteId
     const{error:me}=await sb.from('marcacoes').insert(m)
     if(me)throw me
-    if(email){const stylistName=teamData.find(t=>String(t.id)===String(stylist))?.nome||'Indiferente';await enviarEmail({tipo:'submissao',cliente_email:email,cliente_nome:name,servico:service,data:date,hora:time,cabeleireiro:stylistName})}
+    if(email){const stylistName=teamData.find(t=>String(t.id)===String(stylist))?.nome||'Indiferente';await enviarEmail({tipo:'submissao',cliente_email:email,cliente_nome:name,servico:selectedServico.nome,data:date,hora:time,cabeleireiro:stylistName})}
     document.getElementById('bookingFormInner').style.display='none'
     btn.style.display='none'
-    document.getElementById('successDetail').textContent=`Obrigado, ${name}! Pedido para ${date} às ${time}. Entraremos em contacto pelo ${phone}.`
+    document.getElementById('successDetail').textContent=`Obrigado, ${name}! Marcação para ${date} às ${time}. Entraremos em contacto pelo ${phone}.`
     document.getElementById('formSuccess').classList.add('show')
   } catch(e){errBox.textContent='Erro ao guardar. Verifica a ligação.';errBox.style.display='block';console.error(e)}
-  finally{btn.disabled=false;btn.textContent='Reservar'}
+  finally{btn.disabled=false;btn.textContent='Confirmar Marcação'}
+}
+
+function resetBookingFlow() {
+  selectedServico=null; selectedStylistId=null
+  goToCategorias()
 }
 
 async function enviarEmail(payload){
@@ -1147,7 +1334,10 @@ async function changeStatus(id,estado){
 
 function openNewBooking(){
   const selS=document.getElementById('anServico')
-  if(selS.options.length===1){SERVICOS.forEach(s=>{const o=document.createElement('option');o.value=o.textContent=s.nome;selS.appendChild(o)})}
+  if(selS.options.length<=1){
+    selS.innerHTML='<option value="">Seleccionar...</option>'
+    SERVICOS_DB.forEach(s=>{const o=document.createElement('option');o.value=s.nome;o.textContent=s.nome;selS.appendChild(o)})
+  }
   ;['anNome','anTelefone','anEmail','anNotas'].forEach(id=>document.getElementById(id).value='')
   document.getElementById('anServico').value=''
   document.getElementById('anEspecialista').value=''
@@ -1229,32 +1419,6 @@ document.addEventListener('keydown', e => {
 })
 
 
-function resetBookingForm() {
-  // Reset selects de serviço e cabeleireira
-  document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('selected'))
-  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'))
-  selectedStylistId = null
-  // Reset campos
-  ;['fName','fPhone','fEmail','fNotes'].forEach(id => document.getElementById(id).value = '')
-  document.getElementById('fService').value = ''
-  document.getElementById('fStylist').value = ''
-  document.getElementById('fServiceTag').style.display = 'none'
-  document.getElementById('fStylistTag').style.display = 'none'
-  document.getElementById('fServiceGroup').classList.remove('preselected')
-  document.getElementById('fStylistGroup').classList.remove('preselected')
-  // Reset flatpickr
-  const fp = document.querySelector('#fDate')._flatpickr
-  if (fp) fp.clear()
-  document.getElementById('fTime').value = ''
-  document.getElementById('fError').style.display = 'none'
-  // Mostrar form / esconder sucesso
-  document.getElementById('bookingFormInner').style.display = ''
-  document.getElementById('fSubmitBtn').style.display = ''
-  document.getElementById('formSuccess').classList.remove('show')
-  // Scroll para o topo do form
-  scrollToForm()
-}
-
 /* ── MISC ── */
 window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50))
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:0,rootMargin:'0px 0px -50px 0px'})
@@ -1264,8 +1428,7 @@ setTimeout(()=>{document.querySelectorAll('.fade-up').forEach(el=>{const r=el.ge
 function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open')}
 
 /* ── INIT ── */
-renderServicesSelect()
-loadTeam()
+loadBookingData()
 initCalendar()
 </script>
 </body>
