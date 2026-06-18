@@ -264,6 +264,23 @@
     /* Divider between services + team */
     .booking-cols { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2.5rem; }
 
+    /* Selection summary (serviço + cabeleireira pré-seleccionados) */
+    .selection-summary {
+      display:flex; align-items:stretch; gap:0;
+      background:var(--warm); border:1.5px solid var(--gold);
+      border-radius:6px; padding:0; margin-bottom:1.75rem; overflow:hidden;
+    }
+    .selection-item { flex:1; padding:1rem 1.25rem; }
+    .selection-divider { width:1.5px; background:var(--border); }
+    .selection-label { font-size:.5rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:.3rem; }
+    .selection-value { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--dark); line-height:1.2; }
+    .selection-value.empty { color:var(--sand); font-style:italic; font-size:.95rem; }
+    .selection-price { font-size:.75rem; color:var(--gold); font-style:italic; margin-top:.15rem; }
+    @media(max-width:560px){
+      .selection-summary { flex-direction:column; }
+      .selection-divider { width:auto; height:1.5px; }
+    }
+
     /* Cabeleireiras list */
     .team-select-list { display:flex; flex-direction:column; gap:8px; max-height:320px; overflow-y:auto; padding-right:4px; scrollbar-width:thin; scrollbar-color:var(--nude) transparent; }
     .team-select-list::-webkit-scrollbar { width:4px; }
@@ -779,10 +796,18 @@
   <!-- VISTA 4: Especialista + Formulário (só online) -->
   <div class="booking-view" id="viewFormulario">
     <button class="btn-back" onclick="goToServicos()">‹ Voltar aos serviços</button>
-    <div style="background:var(--warm);border-radius:6px;padding:1rem 1.25rem;margin-bottom:1.5rem">
-      <div style="font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem">Serviço seleccionado</div>
-      <div style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--dark)" id="selectedServiceName">—</div>
-      <div style="font-size:.8rem;color:var(--gold);font-style:italic" id="selectedServicePrice">—</div>
+    <div class="selection-summary" id="selectionSummary">
+      <div class="selection-item">
+        <div class="selection-label">Serviço</div>
+        <div class="selection-value" id="selectedServiceName">—</div>
+        <div class="selection-price" id="selectedServicePrice">—</div>
+      </div>
+      <div class="selection-divider"></div>
+      <div class="selection-item">
+        <div class="selection-label">Cabeleireira</div>
+        <div class="selection-value" id="selectedStylistName">Por escolher</div>
+        <div class="selection-price" id="selectedStylistRole"></div>
+      </div>
     </div>
 
     <!-- Escolher cabeleireira -->
@@ -981,6 +1006,11 @@ function selectServico(servicoId) {
   selectedStylistId = null
   document.getElementById('selectedServiceName').textContent = selectedServico.nome
   document.getElementById('selectedServicePrice').textContent = selectedServico.preco || ''
+  // Reset resumo cabeleireira
+  const stylistName = document.getElementById('selectedStylistName')
+  stylistName.textContent = 'Por escolher'
+  stylistName.classList.add('empty')
+  document.getElementById('selectedStylistRole').textContent = ''
   renderTeamSelect()
   // reset form
   document.getElementById('bookingFormInner').style.display = ''
@@ -1038,6 +1068,17 @@ function selectStylist(id, nome, btn) {
   document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'))
   btn.classList.add('selected')
   selectedStylistId = id
+  // Actualizar resumo
+  const nameEl = document.getElementById('selectedStylistName')
+  const roleEl = document.getElementById('selectedStylistRole')
+  nameEl.textContent = nome
+  nameEl.classList.remove('empty')
+  if (id) {
+    const t = teamData.find(x => String(x.id) === String(id))
+    roleEl.textContent = t?.especialidade || ''
+  } else {
+    roleEl.textContent = 'Qualquer disponível'
+  }
 }
 
 /* ── BREADCRUMB ── */
