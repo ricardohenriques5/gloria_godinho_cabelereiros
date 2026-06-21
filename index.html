@@ -796,19 +796,6 @@
   <!-- VISTA 4: Especialista + Formulário (só online) -->
   <div class="booking-view" id="viewFormulario">
     <button class="btn-back" onclick="goToServicos()">‹ Voltar aos serviços</button>
-    <div class="selection-summary" id="selectionSummary">
-      <div class="selection-item">
-        <div class="selection-label">Serviço</div>
-        <div class="selection-value" id="selectedServiceName">—</div>
-        <div class="selection-price" id="selectedServicePrice">—</div>
-      </div>
-      <div class="selection-divider"></div>
-      <div class="selection-item">
-        <div class="selection-label">Cabeleireira</div>
-        <div class="selection-value" id="selectedStylistName">Por escolher</div>
-        <div class="selection-price" id="selectedStylistRole"></div>
-      </div>
-    </div>
 
     <!-- Escolher cabeleireira -->
     <div class="booking-step-title"><span>1</span>Escolhe a cabeleireira</div>
@@ -818,6 +805,10 @@
     <div class="booking-form-wrap" id="bookingFormWrap">
       <div class="booking-step-title"><span>2</span>Os teus dados</div>
       <div id="bookingFormInner">
+        <div class="form-row">
+          <div class="form-group preselected" id="fServiceGroup"><label class="form-label">Serviço <span class="preselected-tag">✓ seleccionado</span></label><input class="form-input" type="text" id="fServiceDisplay" readonly></div>
+          <div class="form-group" id="fStylistGroup"><label class="form-label">Cabeleireira <span class="preselected-tag" id="fStylistTag" style="display:none">✓ seleccionada</span></label><input class="form-input" type="text" id="fStylistDisplay" readonly placeholder="Escolhe acima..."></div>
+        </div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Nome</label><input class="form-input" type="text" id="fName" placeholder="O seu nome"></div>
           <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="tel" id="fPhone" placeholder="9XX XXX XXX"></div>
@@ -1004,13 +995,11 @@ function marcarWhatsapp(servicoNome) {
 function selectServico(servicoId) {
   selectedServico = SERVICOS_DB.find(s => s.id === servicoId)
   selectedStylistId = null
-  document.getElementById('selectedServiceName').textContent = selectedServico.nome
-  document.getElementById('selectedServicePrice').textContent = selectedServico.preco || ''
-  // Reset resumo cabeleireira
-  const stylistName = document.getElementById('selectedStylistName')
-  stylistName.textContent = 'Por escolher'
-  stylistName.classList.add('empty')
-  document.getElementById('selectedStylistRole').textContent = ''
+  document.getElementById('fServiceDisplay').value = selectedServico.nome + (selectedServico.preco ? '  ·  ' + selectedServico.preco : '')
+  // Reset campo cabeleireira
+  document.getElementById('fStylistDisplay').value = ''
+  document.getElementById('fStylistTag').style.display = 'none'
+  document.getElementById('fStylistGroup').classList.remove('preselected')
   renderTeamSelect()
   // reset form
   document.getElementById('bookingFormInner').style.display = ''
@@ -1068,17 +1057,21 @@ function selectStylist(id, nome, btn) {
   document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('selected'))
   btn.classList.add('selected')
   selectedStylistId = id
-  // Actualizar resumo
-  const nameEl = document.getElementById('selectedStylistName')
-  const roleEl = document.getElementById('selectedStylistRole')
-  nameEl.textContent = nome
-  nameEl.classList.remove('empty')
-  if (id) {
-    const t = teamData.find(x => String(x.id) === String(id))
-    roleEl.textContent = t?.especialidade || ''
-  } else {
-    roleEl.textContent = 'Qualquer disponível'
-  }
+  // Preencher campo no formulário
+  document.getElementById('fStylistDisplay').value = nome
+  document.getElementById('fStylistTag').style.display = 'inline'
+  document.getElementById('fStylistGroup').classList.add('preselected')
+  // Scroll suave para o formulário ficar centrado
+  scrollToForm()
+}
+
+function scrollToForm() {
+  // Scroll até ao título "Os teus dados" para o utilizador ver o próximo passo
+  const wrap = document.getElementById('bookingFormWrap')
+  const title = wrap.querySelector('.booking-step-title')
+  const target = title || wrap
+  const y = target.getBoundingClientRect().top + window.scrollY - 100
+  window.scrollTo({ top: Math.max(0,y), behavior:'smooth' })
 }
 
 /* ── BREADCRUMB ── */
@@ -1161,20 +1154,27 @@ async function submitBooking() {
   const stylist=selectedStylistId
   if (!selectedServico) { errBox.textContent='Serviço não seleccionado.'; errBox.style.display='block'; return }
   if (!name||!phone||!date||!time) { errBox.textContent='Por favor preencha: nome, telefone, data e hora.'; errBox.style.display='block'; return }
-  btn.disabled=true; btn.textContent='A enviar...'
+  btn.disabled=true; btn.textContent='A verificar...'
   try {
+    // 1. Verificar no Supabase
     const q=sb.from('marcacoes').select('id').eq('data',date).eq('hora',time+':00').in('estado',['pendente','confirmada'])
     if(stylist) q.eq('cabeleireiro_id',parseInt(stylist))
     const {data:exist}=await q
     if(exist&&exist.length){errBox.textContent='Esse horário já está reservado. Escolhe outra hora ou cabeleireira.';errBox.style.display='block';btn.disabled=false;btn.textContent='Confirmar Marcação';return}
+    // 2. Verificar no Google Calendar
+    try {
+      const calRes=await fetch(EDGE_FN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify({tipo:'verificar_disponibilidade',data:date,hora:time,duracao_min:selectedServico.duracao_min||60})})
+      const calData=await calRes.json()
+      if(calData.disponivel===false){errBox.textContent='Esse horário já está ocupado no calendário. Escolhe outra hora.';errBox.style.display='block';btn.disabled=false;btn.textContent='Confirmar Marcação';return}
+    } catch(calErr){console.warn('Calendar check skipped:',calErr)}
     let clienteId=null
     if(email){const{data:ce}=await sb.from('clientes').select('id').eq('email',email).maybeSingle();if(ce){clienteId=ce.id}else{const{data:nc}=await sb.from('clientes').insert({nome:name,email,telefone:phone}).select('id').single();if(nc)clienteId=nc.id}}
-    const m={cliente_nome:name,cliente_email:email||null,cliente_telefone:phone,servico:selectedServico.nome,servico_id:selectedServico.id,data:date,hora:time+':00',notas:notes||null,estado:'pendente'}
+    const m={cliente_nome:name,cliente_email:email||null,cliente_telefone:phone,servico:selectedServico.nome,servico_id:selectedServico.id,data:date,hora:time+':00',notas:notes||null,estado:'confirmada'}
     if(stylist)m.cabeleireiro_id=parseInt(stylist)
     if(clienteId)m.cliente_id=clienteId
     const{error:me}=await sb.from('marcacoes').insert(m)
     if(me)throw me
-    if(email){const stylistName=teamData.find(t=>String(t.id)===String(stylist))?.nome||'Indiferente';await enviarEmail({tipo:'submissao',cliente_email:email,cliente_nome:name,servico:selectedServico.nome,data:date,hora:time,cabeleireiro:stylistName})}
+    if(email){const stylistName=teamData.find(t=>String(t.id)===String(stylist))?.nome||'Indiferente';await enviarEmail({tipo:'submissao_online',cliente_email:email,cliente_nome:name,servico:selectedServico.nome,data:date,hora:time,cabeleireiro:stylistName,duracao_min:selectedServico.duracao_min||60})}
     document.getElementById('bookingFormInner').style.display='none'
     btn.style.display='none'
     document.getElementById('successDetail').textContent=`Obrigado, ${name}! Marcação para ${date} às ${time}. Entraremos em contacto pelo ${phone}.`
