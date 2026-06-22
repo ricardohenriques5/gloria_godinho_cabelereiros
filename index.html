@@ -907,12 +907,12 @@ const CAT_IMGS = {
 async function loadBookingData() {
   const [cats, servs, team, sc] = await Promise.all([
     sb.from('categorias').select('*').eq('ativo',true).order('ordem'),
-    sb.from('servicos').select('*').eq('ativo',true).eq('bloqueado',false).order('ordem'),
+    sb.from('servicos').select('*').eq('ativo',true).order('ordem'),
     sb.from('cabeleireiros').select('*').eq('ativo',true).order('nome'),
     sb.from('servico_cabeleireiro').select('*'),
   ])
   CATEGORIAS = cats.data || []
-  SERVICOS_DB = servs.data || []
+  SERVICOS_DB = (servs.data || []).filter(s => !s.bloqueado)
   teamData = team.data || []
   servicoCabeleireiro = sc.data || []
   renderCategorias()
@@ -1360,10 +1360,17 @@ async function renderServicosAdmin() {
 }
 
 async function toggleServicoBloqueado(id, bloqueadoActual) {
-  await sb.from('servicos').update({ bloqueado: !bloqueadoActual }).eq('id', id)
+  // Garantir que é booleano (pode vir como string "true"/"false" do HTML)
+  const actual = (bloqueadoActual === true || bloqueadoActual === 'true')
+  const { error } = await sb.from('servicos').update({ bloqueado: !actual }).eq('id', id)
+  if (error) {
+    alert('Erro ao alterar serviço: ' + error.message)
+    console.error(error)
+    return
+  }
   // Recarregar serviços do site para reflectir a mudança imediatamente
   const { data } = await sb.from('servicos').select('*').eq('ativo',true).order('ordem')
-  if (data) SERVICOS_DB = data
+  if (data) SERVICOS_DB = data.filter(s => !s.bloqueado)
   renderServicosAdmin()
 }
 
