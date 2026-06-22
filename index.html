@@ -797,7 +797,7 @@
 
   <!-- VISTA 3: Serviços -->
   <div class="booking-view" id="viewServicos">
-    <button class="btn-back" id="backToSubcatBtn" onclick="goToSubcategorias()">‹ Voltar</button>
+    <button class="btn-back" id="backToSubcatBtn">‹ Voltar</button>
     <div id="servicosList"></div>
   </div>
 
@@ -942,17 +942,41 @@ function renderCategorias() {
 }
 
 /* ── VISTA 2: SUBCATEGORIAS ── */
-function goToSubcategorias(maeId) {
-  if (maeId !== undefined) currentMae = CATEGORIAS.find(c => c.id === maeId)
-  const subs = CATEGORIAS.filter(c => c.parent_id === currentMae.id)
+function goToSubcategorias(catId) {
+  // Suporta 2 e 3 níveis: catId pode ser mãe ou filha-com-filhas
+  const cat = CATEGORIAS.find(c => c.id === catId)
+  if (!cat) return
+  // Se catId é uma mãe (sem parent), actualiza currentMae
+  if (!cat.parent_id) {
+    currentMae = cat
+    currentSubcat = null
+  } else {
+    // É uma filha que tem as suas próprias filhas (ex: Manicure)
+    currentSubcat = cat
+  }
+  const parentId = catId
+  const subs = CATEGORIAS.filter(c => c.parent_id === parentId)
   const grid = document.getElementById('subcatGrid')
   grid.innerHTML = subs.map(sub => {
-    const numServ = SERVICOS_DB.filter(s => s.categoria_id === sub.id).length
+    // Contar serviços directos + serviços das filhas da sub
+    const subFilhas = CATEGORIAS.filter(c => c.parent_id === sub.id)
+    const numServ = subFilhas.length
+      ? subFilhas.reduce((acc,f) => acc + SERVICOS_DB.filter(s => s.categoria_id === f.id).length, 0)
+      : SERVICOS_DB.filter(s => s.categoria_id === sub.id).length
     return `<button class="subcat-card" onclick="goToServicos(${sub.id})" type="button">
       <div class="subcat-card-name">${sub.nome}</div>
       <div class="subcat-card-count">${numServ} serviço${numServ!==1?'s':''}</div>
     </button>`
   }).join('')
+  // Botão de voltar
+  const backBtn = document.getElementById('backToSubcatBtn')
+  if (currentSubcat && currentMae) {
+    backBtn.onclick = () => goToSubcategorias(currentMae.id)
+    backBtn.textContent = '‹ Voltar a ' + currentMae.nome
+  } else {
+    backBtn.onclick = goToCategorias
+    backBtn.textContent = '‹ Voltar às categorias'
+  }
   updateBreadcrumb()
   switchView('viewSubcategorias')
 }
@@ -960,6 +984,20 @@ function goToSubcategorias(maeId) {
 /* ── VISTA 3: SERVIÇOS ── */
 function goToServicos(subId) {
   if (subId !== undefined) currentSubcat = CATEGORIAS.find(c => c.id === subId)
+  // Se esta categoria tem filhas, mostra subcategorias em vez de serviços
+  const filhas = CATEGORIAS.filter(c => c.parent_id === currentSubcat.id)
+  if (filhas.length) { goToSubcategorias(currentSubcat.id); return }
+  // Configurar botão voltar
+  const backBtn = document.getElementById('backToSubcatBtn')
+  const parent = CATEGORIAS.find(c => c.id === currentSubcat.parent_id)
+  if (parent && parent.parent_id) {
+    // A subcategoria actual é filha de uma filha (3º nível) — volta para o nível 2
+    backBtn.onclick = () => goToSubcategorias(parent.id)
+    backBtn.textContent = '‹ Voltar a ' + parent.nome
+  } else {
+    backBtn.onclick = () => goToSubcategorias(currentMae.id)
+    backBtn.textContent = '‹ Voltar a ' + (currentMae?.nome || 'categorias')
+  }
   const servs = SERVICOS_DB.filter(s => s.categoria_id === currentSubcat.id)
   const online = servs.filter(s => s.tipo === 'online')
   const whatsapp = servs.filter(s => s.tipo === 'whatsapp')
@@ -1323,6 +1361,9 @@ async function renderServicosAdmin() {
 
 async function toggleServicoBloqueado(id, bloqueadoActual) {
   await sb.from('servicos').update({ bloqueado: !bloqueadoActual }).eq('id', id)
+  // Recarregar serviços do site para reflectir a mudança imediatamente
+  const { data } = await sb.from('servicos').select('*').eq('ativo',true).order('ordem')
+  if (data) SERVICOS_DB = data
   renderServicosAdmin()
 }
 
