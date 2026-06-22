@@ -260,6 +260,7 @@
     .servico-action.online { color:var(--gold); }
     .servico-action.whatsapp { color:#25D366; }
     .servico-action-icon { font-size:1rem; }
+    .servicos-grupo-label { font-size:.55rem; letter-spacing:.2em; text-transform:uppercase; color:var(--terracotta); margin:1rem 0 .5rem; padding-left:.25rem; border-left:2px solid var(--terracotta); }
 
     /* Divider between services + team */
     .booking-cols { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2.5rem; }
@@ -641,6 +642,7 @@
       <div class="admin-tabs">
         <button class="admin-tab active" onclick="switchAdminTab('lista',this)">Lista de Marcações</button>
         <button class="admin-tab" onclick="switchAdminTab('calendario',this)">Calendário</button>
+        <button class="admin-tab" onclick="switchAdminTab('servicos',this)">Serviços</button>
         <button class="admin-tab" onclick="openNewBooking()">+ Nova Marcação</button>
       </div>
 
@@ -675,6 +677,12 @@
           <tbody id="bookingsBody"></tbody>
         </table></div>
         <div class="no-bookings" id="noBookings" style="display:none">Sem marcações para mostrar.</div>
+      </div>
+
+      <!-- TAB: SERVIÇOS (bloquear/desbloquear) -->
+      <div class="admin-tab-panel" id="tabServicos">
+        <div class="admin-section-title" style="margin-bottom:1.25rem">Gerir Serviços</div>
+        <div id="servicosAdminList"></div>
       </div>
 
       <!-- TAB: CALENDÁRIO -->
@@ -899,7 +907,7 @@ const CAT_IMGS = {
 async function loadBookingData() {
   const [cats, servs, team, sc] = await Promise.all([
     sb.from('categorias').select('*').eq('ativo',true).order('ordem'),
-    sb.from('servicos').select('*').eq('ativo',true).order('ordem'),
+    sb.from('servicos').select('*').eq('ativo',true).eq('bloqueado',false).order('ordem'),
     sb.from('cabeleireiros').select('*').eq('ativo',true).order('nome'),
     sb.from('servico_cabeleireiro').select('*'),
   ])
@@ -964,21 +972,26 @@ function goToServicos(subId) {
       <div class="servico-row" onclick="selectServico(${s.id})">
         <div class="servico-info">
           <div class="servico-nome">${s.nome}</div>
-          <div class="servico-preco">${s.preco||''}</div>
         </div>
         <div class="servico-action online"><span class="servico-action-icon">✦</span> Marcar</div>
       </div>`).join('')
   }
   if (whatsapp.length) {
     html += `<div class="servicos-section-label">Marcação por WhatsApp</div>`
-    html += whatsapp.map(s => `
-      <div class="servico-row whatsapp" onclick="marcarWhatsapp('${s.nome.replace(/'/g,"\\'")}')">
-        <div class="servico-info">
-          <div class="servico-nome">${s.nome}</div>
-          <div class="servico-preco sob-consulta">${s.preco||'Sob consulta'}</div>
-        </div>
-        <div class="servico-action whatsapp"><span class="servico-action-icon">✆</span> WhatsApp</div>
-      </div>`).join('')
+    // Agrupar por grupo (ex: Pestanas / Sobrancelhas)
+    const grupos = [...new Set(whatsapp.map(s => s.grupo || ''))]
+    grupos.forEach(grupo => {
+      const grupoServs = whatsapp.filter(s => (s.grupo || '') === grupo)
+      if (grupo) html += `<div class="servicos-grupo-label">${grupo}</div>`
+      html += grupoServs.map(s => `
+        <div class="servico-row whatsapp" onclick="marcarWhatsapp('${s.nome.replace(/'/g,"\\'")}')">
+          <div class="servico-info">
+            <div class="servico-nome">${s.nome}</div>
+            <div class="servico-preco sob-consulta">Sob consulta</div>
+          </div>
+          <div class="servico-action whatsapp"><span class="servico-action-icon">✆</span> WhatsApp</div>
+        </div>`).join('')
+    })
   }
   document.getElementById('servicosList').innerHTML = html
   updateBreadcrumb()
@@ -1282,12 +1295,35 @@ function filterBookings(estado,btn,dateFilter){
 
 
 function switchAdminTab(tab, btn) {
-  // Tabs
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'))
   btn.classList.add('active')
-  // Panels
   document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'))
-  document.getElementById(tab === 'lista' ? 'tabLista' : 'tabCalendario').classList.add('active')
+  const panels = { lista:'tabLista', calendario:'tabCalendario', servicos:'tabServicos' }
+  document.getElementById(panels[tab] || 'tabLista').classList.add('active')
+  if (tab === 'servicos') renderServicosAdmin()
+}
+
+async function renderServicosAdmin() {
+  const el = document.getElementById('servicosAdminList')
+  el.innerHTML = '<div style="color:var(--sand);font-size:.8rem">A carregar...</div>'
+  const { data } = await sb.from('servicos').select('id,nome,bloqueado,tipo,categoria_id').eq('ativo',true).order('categoria_id').order('ordem')
+  if (!data) return
+  el.innerHTML = data.map(s => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid rgba(196,149,106,.1);gap:1rem">
+      <div>
+        <div style="color:#F6E8EA;font-size:.85rem">${s.nome}</div>
+        <div style="color:var(--gold);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase">${s.tipo}</div>
+      </div>
+      <button onclick="toggleServicoBloqueado(${s.id},${s.bloqueado})"
+        style="font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .75rem;border:1px solid;cursor:pointer;font-family:'Jost',sans-serif;background:none;transition:all .2s;color:${s.bloqueado ? '#8dc88d' : '#e09090'};border-color:${s.bloqueado ? 'rgba(100,180,100,.3)' : 'rgba(200,100,100,.3)'}">
+        ${s.bloqueado ? '✓ Activar' : '✗ Bloquear'}
+      </button>
+    </div>`).join('')
+}
+
+async function toggleServicoBloqueado(id, bloqueadoActual) {
+  await sb.from('servicos').update({ bloqueado: !bloqueadoActual }).eq('id', id)
+  renderServicosAdmin()
 }
 
 function toggleTeamDropdown() {
