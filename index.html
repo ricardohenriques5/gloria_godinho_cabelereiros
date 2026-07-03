@@ -717,7 +717,7 @@
 <!-- HERO -->
 <section id="hero">
   <div class="hero-img">
-    <img src="https://lztidnfuvtweyeowbcrs.supabase.co/storage/v1/object/public/Fotos/Logo/Logo%20Draft%203.png?w=1400&h=900&fit=crop&crop=center" alt="Salão">
+    <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1400&h=900&fit=crop&crop=center" alt="Salão">
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-content fade-up visible">
@@ -1207,25 +1207,41 @@ async function submitBooking() {
   if (!name||!phone||!date||!time) { errBox.textContent='Por favor preencha: nome, telefone, data e hora.'; errBox.style.display='block'; return }
   btn.disabled=true; btn.textContent='A verificar...'
   try {
-    // 1. Verificar no Supabase
-    const q=sb.from('marcacoes').select('id').eq('data',date).eq('hora',time+':00').in('estado',['pendente','confirmada'])
-    if(stylist) q.eq('cabeleireiro_id',parseInt(stylist))
-    const {data:exist}=await q
-    if(exist&&exist.length){errBox.textContent='Esse horário já está reservado. Escolhe outra hora ou cabeleireira.';errBox.style.display='block';btn.disabled=false;btn.textContent='Confirmar Marcação';return}
-    // 2. Verificar no Google Calendar
+    // Determinar candidatos: colaboradora escolhida OU todas as que fazem o serviço (Indiferente)
+    let candidatos=[]
+    if(stylist){
+      const t=teamData.find(x=>String(x.id)===String(stylist))
+      if(t)candidatos=[t.nome]
+    }else{
+      // Indiferente: todas as colaboradoras que fazem este serviço (excepto Andreia, que é whatsapp)
+      const ids=servicoCabeleireiro.filter(sc=>sc.servico_id===selectedServico.id).map(sc=>sc.cabeleireiro_id)
+      candidatos=teamData.filter(t=>ids.includes(t.id)&&t.nome!=='Andreia').map(t=>t.nome)
+    }
+    // Verificar disponibilidade por cor no Google Calendar
+    let cabeleireiraFinal=null
     try {
-      const calRes=await fetch(EDGE_FN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify({tipo:'verificar_disponibilidade',data:date,hora:time,duracao_min:selectedServico.duracao_min||60})})
+      const calRes=await fetch(EDGE_FN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify({tipo:'verificar_disponibilidade',servico:selectedServico.nome,data:date,hora:time,duracao_min:selectedServico.duracao_min||60,candidatos})})
       const calData=await calRes.json()
-      if(calData.disponivel===false){errBox.textContent='Esse horário já está ocupado no calendário. Escolhe outra hora.';errBox.style.display='block';btn.disabled=false;btn.textContent='Confirmar Marcação';return}
+      if(calData.disponivel===false){
+        errBox.textContent='Esse horário não tem disponibilidade. Por favor escolhe outra hora.';errBox.style.display='block';btn.disabled=false;btn.textContent='Confirmar Marcação';return
+      }
+      cabeleireiraFinal=calData.cabeleireiro||null
     } catch(calErr){console.warn('Calendar check skipped:',calErr)}
+    // Resolver o ID da colaboradora final (para a marcação no Supabase)
+    let stylistFinalId=stylist?parseInt(stylist):null
+    let stylistFinalNome=cabeleireiraFinal||teamData.find(t=>String(t.id)===String(stylist))?.nome||'Indiferente'
+    if(!stylist&&cabeleireiraFinal){
+      const t=teamData.find(x=>x.nome===cabeleireiraFinal)
+      if(t)stylistFinalId=t.id
+    }
     let clienteId=null
     if(email){const{data:ce}=await sb.from('clientes').select('id').eq('email',email).maybeSingle();if(ce){clienteId=ce.id}else{const{data:nc}=await sb.from('clientes').insert({nome:name,email,telefone:phone}).select('id').single();if(nc)clienteId=nc.id}}
     const m={cliente_nome:name,cliente_email:email||null,cliente_telefone:phone,servico:selectedServico.nome,servico_id:selectedServico.id,data:date,hora:time+':00',notas:notes||null,estado:'confirmada'}
-    if(stylist)m.cabeleireiro_id=parseInt(stylist)
+    if(stylistFinalId)m.cabeleireiro_id=stylistFinalId
     if(clienteId)m.cliente_id=clienteId
     const{error:me}=await sb.from('marcacoes').insert(m)
     if(me)throw me
-    if(email){const stylistName=teamData.find(t=>String(t.id)===String(stylist))?.nome||'Indiferente';await enviarEmail({tipo:'submissao_online',cliente_email:email,cliente_nome:name,servico:selectedServico.nome,data:date,hora:time,cabeleireiro:stylistName,duracao_min:selectedServico.duracao_min||60})}
+    if(email){await enviarEmail({tipo:'submissao_online',cliente_email:email,cliente_nome:name,servico:selectedServico.nome,data:date,hora:time,cabeleireiro:stylistFinalNome,duracao_min:selectedServico.duracao_min||60})}
     document.getElementById('bookingFormInner').style.display='none'
     btn.style.display='none'
     document.getElementById('successDetail').textContent=`Obrigado, ${name}! Marcação para ${date} às ${time}. Entraremos em contacto pelo ${phone}.`
