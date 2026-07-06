@@ -1214,6 +1214,8 @@ async function submitBooking() {
   const notes=document.getElementById('fNotes').value.trim()
   const stylist=selectedStylistId
   if (!selectedServico) { errBox.textContent='Serviço não seleccionado.'; errBox.style.display='block'; return }
+  if(!email){errBox.textContent='Por favor indica o teu email — é necessário para confirmarmos a marcação e criar o evento no calendário.';errBox.style.display='block';return}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errBox.textContent='Introduz um email válido.';errBox.style.display='block';return}
   if (!name||!phone||!date||!time) { errBox.textContent='Por favor preencha: nome, telefone, data e hora.'; errBox.style.display='block'; return }
   btn.disabled=true; btn.textContent='A verificar...'
   try {
@@ -1254,7 +1256,7 @@ async function submitBooking() {
     if(email){await enviarEmail({tipo:'submissao_online',cliente_email:email,cliente_nome:name,servico:selectedServico.nome,data:date,hora:time,cabeleireiro:stylistFinalNome,duracao_min:selectedServico.duracao_min||60})}
     document.getElementById('bookingFormInner').style.display='none'
     btn.style.display='none'
-    document.getElementById('successDetail').textContent=`Obrigado, ${name}! Marcação para ${date} às ${time}. Entraremos em contacto pelo ${phone}.`
+    document.getElementById('successDetail').textContent=`Obrigado, ${name}! Marcação para ${date} às ${time}. Entraremos em contacto pelo email ${email}.`
     document.getElementById('formSuccess').classList.add('show')
   } catch(e){errBox.textContent='Erro ao guardar. Verifica a ligação.';errBox.style.display='block';console.error(e)}
   finally{btn.disabled=false;btn.textContent='Confirmar Marcação'}
