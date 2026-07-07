@@ -1214,9 +1214,8 @@ async function submitBooking() {
   const notes=document.getElementById('fNotes').value.trim()
   const stylist=selectedStylistId
   if (!selectedServico) { errBox.textContent='Serviço não seleccionado.'; errBox.style.display='block'; return }
-  if(!email){errBox.textContent='Por favor indica o teu email — é necessário para confirmarmos a marcação e criar o evento no calendário.';errBox.style.display='block';return}
+  if(!name||!phone||!email||!date||!time){errBox.textContent='Por favor preenche todos os campos obrigatórios: nome, telefone, email, data e hora.';errBox.style.display='block';return}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errBox.textContent='Introduz um email válido.';errBox.style.display='block';return}
-  if (!name||!phone||!date||!time) { errBox.textContent='Por favor preencha: nome, telefone, data e hora.'; errBox.style.display='block'; return }
   btn.disabled=true; btn.textContent='A verificar...'
   try {
     // Determinar candidatos: colaboradora escolhida OU todas as que fazem o serviço (Indiferente)
